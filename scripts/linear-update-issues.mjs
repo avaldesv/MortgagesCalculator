@@ -87,20 +87,20 @@ async function main() {
   const args = process.argv.slice(2);
   const doneIdx = args.indexOf('--done');
   const progIdx = args.indexOf('--in-progress');
+  const backlogIdx = args.indexOf('--backlog');
 
-  const { teamId, doneId, startedId } = await getTeamAndStates();
+  const { teamId, doneId, startedId, backlogId } = await getTeamAndStates();
   if (!doneId || !startedId) throw new Error('Workflow states not found');
 
-  const defaultDone = [
-    'AVV-20', 'AVV-21', 'AVV-22',
-    'AVV-23', 'AVV-24', 'AVV-25', 'AVV-26', 'AVV-27', 'AVV-28',
-    'AVV-29', 'AVV-30', 'AVV-31', 'AVV-32', 'AVV-33', 'AVV-34',
-  ];
+  if (doneIdx < 0 && progIdx < 0 && backlogIdx < 0) {
+    console.error('Pass --done ID,... and/or --in-progress ID,... and/or --backlog ID,...');
+    console.error('Never run without args (avoids marking entire P0-A Done by mistake).');
+    process.exit(1);
+  }
 
-  const toDone =
-    doneIdx >= 0 ? args[doneIdx + 1].split(',').map((s) => s.trim()) : defaultDone;
-  const toProgress =
-    progIdx >= 0 ? args[progIdx + 1].split(',').map((s) => s.trim()) : [];
+  const toDone = doneIdx >= 0 ? args[doneIdx + 1].split(',').map((s) => s.trim()) : [];
+  const toProgress = progIdx >= 0 ? args[progIdx + 1].split(',').map((s) => s.trim()) : [];
+  const toBacklog = backlogIdx >= 0 ? args[backlogIdx + 1].split(',').map((s) => s.trim()) : [];
 
   for (const id of toDone) {
     const issue = await findIssueByIdentifier(id, teamId);
@@ -120,6 +120,17 @@ async function main() {
     }
     const r = await updateIssue(issue.id, startedId);
     console.log(`In Progress: ${r.issueUpdate.issue.identifier} — ${r.issueUpdate.issue.title}`);
+  }
+
+  for (const id of toBacklog) {
+    const issue = await findIssueByIdentifier(id, teamId);
+    if (!issue) {
+      console.warn(`Skip ${id}: not found`);
+      continue;
+    }
+    const stateId = backlogId ?? startedId;
+    const r = await updateIssue(issue.id, stateId);
+    console.log(`Backlog: ${r.issueUpdate.issue.identifier} — ${r.issueUpdate.issue.title}`);
   }
 }
 
