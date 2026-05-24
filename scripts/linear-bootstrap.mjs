@@ -232,7 +232,7 @@ async function main() {
   }
 
   const statesRes = await gql(
-    `query($teamId: String!) {
+    `query($teamId: ID!) {
       workflowStates(filter: { team: { id: { eq: $teamId } } }) {
         nodes { id name type }
       }
