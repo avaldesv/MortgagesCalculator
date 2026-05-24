@@ -1,0 +1,68 @@
+{
+  "placements": [
+    {
+      "id": "slot-simple-right",
+      "enabled": true,
+      "position": "middle-right",
+      "tabs": ["simple-calculator", "advanced-calculator", "affordability"],
+      "maxListings": 2,
+      "sponsoredLabel": "Sponsored",
+      "priority": 10,
+      "updatedAt": "2026-05-24T00:00:00.000Z"
+    },
+    {
+      "id": "slot-homes-footer",
+      "enabled": true,
+      "position": "footer",
+      "tabs": ["homes-by-payment"],
+      "maxListings": 3,
+      "sponsoredLabel": "Sponsored Home",
+      "priority": 5,
+      "updatedAt": "2026-05-24T00:00:00.000Z"
+    }
+  ],
+  "listings": [
+    {
+      "id": "lst-1",
+      "price": 425000,
+      "city": "Orlando",
+      "state": "FL",
+      "estimatedMonthlyPayment": 2780,
+      "bedrooms": 3,
+      "bathrooms": 2,
+      "squareFeet": 1850,
+      "agentOrCompany": "Sunshine Realty Group",
+      "listingUrl": "https://example.com/listing/1",
+      "zip": "32801",
+      "active": true
+    },
+    {
+      "id": "lst-2",
+      "price": 389000,
+      "city": "Tampa",
+      "state": "FL",
+      "estimatedMonthlyPayment": 2540,
+      "bedrooms": 3,
+      "bathrooms": 2,
+      "squareFeet": 1620,
+      "agentOrCompany": "Gulf Coast Homes",
+      "listingUrl": "https://example.com/listing/2",
+      "zip": "33602",
+      "active": true
+    },
+    {
+      "id": "lst-3",
+      "price": 515000,
+      "city": "Austin",
+      "state": "TX",
+      "estimatedMonthlyPayment": 3120,
+      "bedrooms": 4,
+      "bathrooms": 3,
+      "squareFeet": 2100,
+      "agentOrCompany": "Lone Star Listings",
+      "listingUrl": "https://example.com/listing/3",
+      "zip": "78701",
+      "active": true
+    }
+  ]
+}

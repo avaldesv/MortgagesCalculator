@@ -1,4 +1,6 @@
 import { Routes } from '@angular/router';
+import { AdminDashboardComponent } from './features/admin/admin-dashboard.component';
+import { AdminLoginComponent } from './features/admin/admin-login.component';
 import { SimpleCalculatorComponent } from './features/simple-calculator/simple-calculator.component';
 import { HomesByPaymentComponent } from './features/homes-by-payment/homes-by-payment.component';
 import { PlaceholderPageComponent } from './features/placeholder/placeholder-page.component';
@@ -32,5 +34,7 @@ export const routes: Routes = [
     title: 'Advertise to Active Homebuyers',
     description: 'Partner with agents, lenders, and home service providers.',
   }},
+  { path: 'admin/login', component: AdminLoginComponent },
+  { path: 'admin', component: AdminDashboardComponent },
   { path: '**', redirectTo: 'simple-calculator' },
 ];

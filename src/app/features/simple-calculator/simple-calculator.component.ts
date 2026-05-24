@@ -27,6 +27,9 @@ export class SimpleCalculatorComponent {
 
   readonly input = signal<SimpleCalculatorInput>(this.calc.defaultInput());
   readonly result = computed(() => this.calc.calculateSimple(this.input()));
+  readonly downPaymentAmount = computed(
+    () => Math.round(this.input().homePrice * (this.input().downPaymentPercent / 100)),
+  );
 
   update<K extends keyof SimpleCalculatorInput>(key: K, value: SimpleCalculatorInput[K]): void {
     this.input.update((prev) => ({ ...prev, [key]: value }));
@@ -35,7 +38,16 @@ export class SimpleCalculatorComponent {
   onNumberChange(key: keyof SimpleCalculatorInput, raw: string): void {
     const num = Number(raw);
     if (!Number.isFinite(num)) return;
-    this.update(key, num as SimpleCalculatorInput[typeof key]);
+    let v = num;
+    if (key === 'homePrice') v = Math.min(50_000_000, Math.max(0, v));
+    if (key === 'downPaymentPercent') v = Math.min(100, Math.max(0, v));
+    if (key === 'interestRate') v = Math.min(30, Math.max(0, v));
+    if (key === 'loanTermYears' && v !== 15 && v !== 20 && v !== 30) return;
+    this.update(key, v as SimpleCalculatorInput[typeof key]);
+  }
+
+  scrollToResults(): void {
+    document.querySelector('.payment-hero')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   setLoanTerm(term: number): void {

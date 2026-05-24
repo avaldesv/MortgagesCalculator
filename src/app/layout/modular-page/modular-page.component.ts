@@ -1,4 +1,4 @@
-import { Component, inject, input } from '@angular/core';
+import { Component, effect, inject, input } from '@angular/core';
 import { AD_PAGE_POSITIONS } from '../../core/models/listings-ad.model';
 import type { TabId } from '../../core/models/tab.model';
 import { ListingsAdConfigService } from '../../core/services/listings-ad-config.service';
@@ -17,6 +17,13 @@ export class ModularPageComponent {
 
   private readonly adConfig = inject(ListingsAdConfigService);
   readonly positions = AD_PAGE_POSITIONS;
+
+  constructor() {
+    effect(() => {
+      this.adConfig.loadPlacementsForTab(this.tabId());
+      this.adConfig.ensureListingsLoaded();
+    });
+  }
 
   slotsFor(position: (typeof AD_PAGE_POSITIONS)[number]) {
     const map = this.adConfig.getActivePlacementsForTab(this.tabId());

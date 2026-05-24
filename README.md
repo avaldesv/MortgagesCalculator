@@ -10,7 +10,7 @@ Modern mortgage calculator for U.S. homebuyers. **Visual design: Coastal Fintech
 - **Admin-configurable listings ads** (`M-listings-ad`): sponsored homes by page position
 - Mobile-first responsive layout
 
-## Quick start
+## Quick start (frontend)
 
 ```bash
 npm install
@@ -18,6 +18,22 @@ npm start
 ```
 
 Open [http://localhost:4200](http://localhost:4200) → redirects to `/simple-calculator`.
+
+## API (NestJS) — local
+
+```bash
+cd backend
+npm install
+npm run start:dev
+```
+
+- Health: `http://localhost:3000/api/health`
+- Admin login: `POST /api/v1/auth/login` — default `admin@mortgagecalc.app` / `changeme123`
+- Admin UI: [http://localhost:4200/admin/login](http://localhost:4200/admin/login)
+
+With `ng serve`, set `apiBaseUrl` in `src/environments/environment.development.ts` or use `proxy.conf.json` and empty `apiBaseUrl` for `/api` proxy.
+
+Env vars (API): `JWT_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `CORS_ORIGIN`.
 
 ## Production build
 
@@ -29,13 +45,18 @@ Output: `dist/mortgage-calculator/browser/`
 
 ## Deploy on Railway
 
-### Option A — Dockerfile (recommended)
+### Web (Angular + nginx)
 
-1. Push this repo to GitHub.
-2. [Railway](https://railway.app) → **New Project** → **Deploy from GitHub repo**.
-3. Railway detects `Dockerfile` and `railway.toml`.
-4. Railway sets `PORT` automatically; nginx listens on that port (default 8080).
-5. Generate a public domain under **Settings → Networking**.
+1. Service root: repo root — uses root `Dockerfile` + `railway.toml`.
+2. Healthcheck path: `/`
+
+### API (NestJS)
+
+1. Add a second service with root directory **`backend/`** — uses `backend/Dockerfile` + `backend/railway.toml`.
+2. Healthcheck path: `/api/health`
+3. Set env: `JWT_SECRET`, `ADMIN_PASSWORD`, `CORS_ORIGIN` (web app URL).
+
+Point production `environment.ts` `apiBaseUrl` to the API Railway URL when wiring staging.
 
 ### Option B — Nixpacks (Node)
 

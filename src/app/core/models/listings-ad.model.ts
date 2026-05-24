@@ -41,4 +41,6 @@ export interface SponsoredListing {
   squareFeet: number;
   agentOrCompany: string;
   listingUrl: string;
+  zip?: string;
+  active?: boolean;
 }

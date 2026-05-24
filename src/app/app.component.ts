@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterLink, RouterOutlet } from '@angular/router';
 import { SiteHeaderComponent } from './layout/site-header/site-header.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, SiteHeaderComponent],
+  imports: [RouterOutlet, RouterLink, SiteHeaderComponent],
   template: `
     <div class="app-shell" data-concept="coastal-fintech">
       <app-site-header />
@@ -13,7 +13,7 @@ import { SiteHeaderComponent } from './layout/site-header/site-header.component'
       <footer class="site-footer">
         <p>
           © {{ year }} MortgageCalc · Estimates only, not a loan offer.
-          Educational calculator — not a loan offer or financial advice.
+          <a routerLink="/admin/login" class="site-footer__admin">Admin</a>
         </p>
       </footer>
     </div>
