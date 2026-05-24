@@ -34,7 +34,7 @@ Output: `dist/mortgage-calculator/browser/`
 1. Push this repo to GitHub.
 2. [Railway](https://railway.app) → **New Project** → **Deploy from GitHub repo**.
 3. Railway detects `Dockerfile` and `railway.toml`.
-4. No extra env vars required (nginx serves static files on port 80).
+4. Railway sets `PORT` automatically; nginx listens on that port (default 8080).
 5. Generate a public domain under **Settings → Networking**.
 
 ### Option B — Nixpacks (Node)
