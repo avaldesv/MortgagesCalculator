@@ -1,0 +1,32 @@
+<aside class="listings-ad" [attr.data-placement-id]="placement().id">
+  <header class="listings-ad__header">
+    <span class="listings-ad__label">{{ label() }}</span>
+    @if (monthlyPayment() > 0) {
+      <span class="listings-ad__context">
+        Near {{ monthlyPayment() | currency: 'USD' : 'symbol' : '1.0-0' }}/mo budget
+      </span>
+    }
+  </header>
+  <ul class="listings-ad__list">
+    @for (home of listings(); track home.id) {
+      <li class="listings-ad__card">
+        <div class="listings-ad__image" role="img" [attr.aria-label]="home.city + ' home'"></div>
+        <div class="listings-ad__body">
+          <p class="listings-ad__price">{{ home.price | currency: 'USD' : 'symbol' : '1.0-0' }}</p>
+          <p class="listings-ad__location">{{ home.city }}, {{ home.state }}</p>
+          <p class="listings-ad__payment">
+            Est. {{ home.estimatedMonthlyPayment | currency: 'USD' : 'symbol' : '1.0-0' }}/mo
+          </p>
+          <p class="listings-ad__meta">
+            {{ home.bedrooms }} Bed · {{ home.bathrooms }} Bath ·
+            {{ home.squareFeet | number }} sq ft
+          </p>
+          <p class="listings-ad__agent">{{ home.agentOrCompany }}</p>
+          <a class="listings-ad__cta" [href]="home.listingUrl" target="_blank" rel="noopener">
+            View Home
+          </a>
+        </div>
+      </li>
+    }
+  </ul>
+</aside>

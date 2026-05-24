@@ -1,0 +1,93 @@
+.listings-ad {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: 0.875rem;
+}
+
+.listings-ad__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.listings-ad__label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.listings-ad__context {
+  font-size: 0.75rem;
+  color: var(--color-muted);
+}
+
+.listings-ad__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.listings-ad__card {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 0.625rem;
+}
+
+.listings-ad__image {
+  background: linear-gradient(145deg, #e2e8f0, #cbd5e1);
+  border-radius: calc(var(--radius-md) - 4px);
+  min-height: 80px;
+}
+
+.listings-ad__price {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.listings-ad__location,
+.listings-ad__meta,
+.listings-ad__agent {
+  margin: 0.1rem 0 0;
+  font-size: 0.78rem;
+  color: var(--color-muted);
+}
+
+.listings-ad__payment {
+  margin: 0.2rem 0 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-accent);
+}
+
+.listings-ad__cta {
+  display: inline-block;
+  margin-top: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+[data-ad-position='footer'] .listings-ad__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+[data-ad-position='footer'] .listings-ad__card {
+  grid-template-columns: 100px 1fr;
+}

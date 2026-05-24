@@ -1,0 +1,9 @@
+node_modules
+dist
+.angular
+.idea
+.git
+*.md
+!README.md
+coverage
+.vscode

@@ -1,0 +1,43 @@
+<app-modular-page tabId="homes-by-payment" [monthlyPayment]="desiredPayment">
+  <section class="hero card">
+    <h1>Find Homes by Monthly Payment</h1>
+    <p class="hero__sub">
+      See homes that may fit your estimated monthly budget — search by payment, not just price.
+    </p>
+  </section>
+
+  <form class="card search-form" (submit)="$event.preventDefault()">
+    <div class="search-form__grid">
+      <label class="field">
+        <span>Desired monthly payment</span>
+        <input type="number" [(ngModel)]="desiredPayment" name="payment" min="500" />
+      </label>
+      <label class="field">
+        <span>ZIP code or city</span>
+        <input type="text" [(ngModel)]="zipCode" name="zip" />
+      </label>
+    </div>
+    <button type="button" class="btn btn--primary">Search Homes</button>
+  </form>
+
+  <section class="homes-grid">
+    @for (home of listings; track home.id) {
+      <article class="card home-card">
+        <div class="home-card__badge">Sponsored Home</div>
+        <div class="home-card__image"></div>
+        <h3>{{ home.price | currency: 'USD' : 'symbol' : '1.0-0' }}</h3>
+        <p>{{ home.city }}, {{ home.state }}</p>
+        <p class="home-card__payment">
+          Est. {{ home.estimatedMonthlyPayment | currency: 'USD' : 'symbol' : '1.0-0' }}/mo
+        </p>
+        <p class="home-card__meta">
+          {{ home.bedrooms }} Bed · {{ home.bathrooms }} Bath · {{ home.squareFeet | number }} sq ft
+        </p>
+        <p class="home-card__agent">{{ home.agentOrCompany }}</p>
+        <a class="btn btn--secondary" [href]="home.listingUrl" target="_blank" rel="noopener">
+          View Home
+        </a>
+      </article>
+    }
+  </section>
+</app-modular-page>

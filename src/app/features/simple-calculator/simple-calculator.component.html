@@ -1,0 +1,160 @@
+<app-modular-page tabId="simple-calculator" [monthlyPayment]="result().monthlyPayment">
+  <section class="hero card">
+    <h1>Simple Mortgage Calculator for U.S. Homebuyers</h1>
+    <p class="hero__sub">
+      Estimate your monthly mortgage payment, understand your costs, and explore homes that may
+      fit your budget.
+    </p>
+    <div class="hero__actions">
+      <button type="button" class="btn btn--primary">Calculate Payment</button>
+      <a routerLink="/homes-by-payment" class="btn btn--secondary">See Homes by Monthly Payment</a>
+    </div>
+  </section>
+
+  <div class="calculator-grid">
+    <form class="card calculator-form" (submit)="$event.preventDefault()">
+      <h2 class="card__title">Loan details</h2>
+
+      <label class="field">
+        <span>Home Price</span>
+        <input
+          type="number"
+          [ngModel]="input().homePrice"
+          (ngModelChange)="onNumberChange('homePrice', $event)"
+          name="homePrice"
+          min="0"
+          step="1000"
+        />
+      </label>
+
+      <label class="field">
+        <span>Down Payment (%)</span>
+        <input
+          type="number"
+          [ngModel]="input().downPaymentPercent"
+          (ngModelChange)="onNumberChange('downPaymentPercent', $event)"
+          name="downPayment"
+          min="0"
+          max="100"
+          step="0.5"
+        />
+      </label>
+
+      <label class="field">
+        <span>Interest Rate (%)</span>
+        <input
+          type="number"
+          [ngModel]="input().interestRate"
+          (ngModelChange)="onNumberChange('interestRate', $event)"
+          name="rate"
+          min="0"
+          max="30"
+          step="0.125"
+        />
+      </label>
+
+      <fieldset class="field">
+        <span>Loan Term</span>
+        <div class="term-options">
+          @for (term of [15, 20, 30]; track term) {
+            <label class="term-option">
+              <input
+                type="radio"
+                name="term"
+                [value]="term"
+                [checked]="input().loanTermYears === term"
+                (change)="setLoanTerm(term)"
+              />
+              {{ term }} years
+            </label>
+          }
+        </div>
+      </fieldset>
+
+      <label class="field">
+        <span>Property Tax (annual)</span>
+        <input
+          type="number"
+          [ngModel]="input().propertyTaxAnnual"
+          (ngModelChange)="onNumberChange('propertyTaxAnnual', $event)"
+          name="tax"
+          min="0"
+        />
+      </label>
+
+      <label class="field">
+        <span>Home Insurance (annual)</span>
+        <input
+          type="number"
+          [ngModel]="input().insuranceAnnual"
+          (ngModelChange)="onNumberChange('insuranceAnnual', $event)"
+          name="insurance"
+          min="0"
+        />
+      </label>
+
+      <label class="field">
+        <span>PMI (monthly, optional)</span>
+        <input
+          type="number"
+          [ngModel]="input().pmiMonthly"
+          (ngModelChange)="onNumberChange('pmiMonthly', $event)"
+          name="pmi"
+          min="0"
+        />
+      </label>
+
+      <label class="field">
+        <span>HOA (monthly, optional)</span>
+        <input
+          type="number"
+          [ngModel]="input().hoaMonthly"
+          (ngModelChange)="onNumberChange('hoaMonthly', $event)"
+          name="hoa"
+          min="0"
+        />
+      </label>
+    </form>
+
+    <div class="results-stack">
+      <div class="card payment-hero">
+        <p class="payment-hero__label">Estimated Monthly Payment</p>
+        <p class="payment-hero__amount">
+          {{ result().monthlyPayment | currency: 'USD' : 'symbol' : '1.0-0' }}
+          <span class="payment-hero__suffix">/mo</span>
+        </p>
+      </div>
+
+      <div class="card">
+        <h3 class="card__title">Payment Breakdown</h3>
+        <app-payment-donut [breakdown]="result().breakdown" />
+        <app-payment-bar [breakdown]="result().breakdown" />
+      </div>
+
+      <div class="summary-cards">
+        <div class="summary-card card">
+          <p class="summary-card__label">Loan Amount</p>
+          <p class="summary-card__value">
+            {{ result().loanAmount | currency: 'USD' : 'symbol' : '1.0-0' }}
+          </p>
+        </div>
+        <div class="summary-card card">
+          <p class="summary-card__label">Monthly Payment</p>
+          <p class="summary-card__value summary-card__value--accent">
+            {{ result().monthlyPayment | currency: 'USD' : 'symbol' : '1.0-0' }}
+          </p>
+        </div>
+        <div class="summary-card card">
+          <p class="summary-card__label">Total Interest</p>
+          <p class="summary-card__value">
+            {{ result().totalInterest | currency: 'USD' : 'symbol' : '1.0-0' }}
+          </p>
+        </div>
+        <div class="summary-card card">
+          <p class="summary-card__label">Est. Payoff Year</p>
+          <p class="summary-card__value">{{ result().payoffYear }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-modular-page>

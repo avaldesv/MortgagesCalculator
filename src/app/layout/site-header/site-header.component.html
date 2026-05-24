@@ -1,0 +1,19 @@
+<header class="site-header">
+  <div class="site-header__brand">
+    <a routerLink="/simple-calculator" class="site-header__logo">MortgageCalc</a>
+    <p class="site-header__tagline">{{ tagline }}</p>
+  </div>
+  <nav class="site-header__nav" aria-label="Main navigation">
+    @for (tab of tabs; track tab.id) {
+      <a
+        [routerLink]="tab.path"
+        routerLinkActive="is-active"
+        class="site-header__tab"
+        [attr.aria-current]="null"
+      >
+        <span class="site-header__tab-full">{{ tab.label }}</span>
+        <span class="site-header__tab-short">{{ tab.shortLabel }}</span>
+      </a>
+    }
+  </nav>
+</header>

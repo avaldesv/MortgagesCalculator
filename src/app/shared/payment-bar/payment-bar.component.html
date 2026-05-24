@@ -1,0 +1,15 @@
+<div class="payment-bar" role="img" aria-label="Monthly payment breakdown bar">
+  @for (item of breakdown(); track item.key) {
+    <div
+      class="payment-bar__segment"
+      [style.flex-grow]="item.percent"
+      [style.background]="item.color"
+      [title]="item.label + ': ' + item.percent + '%'"
+    ></div>
+  }
+</div>
+<ul class="payment-bar__labels">
+  @for (item of breakdown(); track item.key) {
+    <li><span [style.background]="item.color"></span>{{ item.label }}</li>
+  }
+</ul>

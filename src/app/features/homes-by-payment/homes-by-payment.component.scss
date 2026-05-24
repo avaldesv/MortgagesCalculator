@@ -1,0 +1,61 @@
+.search-form__grid {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1rem;
+
+  @media (min-width: 600px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.homes-grid {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.25rem;
+
+  @media (min-width: 700px) {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+}
+
+.home-card {
+  position: relative;
+
+  h3 {
+    margin: 0.5rem 0 0.15rem;
+  }
+
+  p {
+    margin: 0.1rem 0;
+    color: var(--color-muted);
+    font-size: 0.9rem;
+  }
+}
+
+.home-card__badge {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
+.home-card__image {
+  height: 140px;
+  background: linear-gradient(145deg, #e2e8f0, #94a3b8);
+  border-radius: calc(var(--radius-md) - 4px);
+  margin: -0.5rem -0.5rem 0.5rem;
+}
+
+.home-card__payment {
+  color: var(--color-accent) !important;
+  font-weight: 600 !important;
+}
+
+.home-card__agent {
+  margin-bottom: 0.75rem !important;
+}

@@ -1,0 +1,11 @@
+<div class="payment-donut">
+  <div class="payment-donut__ring" [style.background]="gradient()" aria-hidden="true"></div>
+  <ul class="payment-donut__legend">
+    @for (item of breakdown(); track item.key) {
+      <li>
+        <span class="payment-donut__swatch" [style.background]="item.color"></span>
+        {{ item.label }}: {{ item.percent }}%
+      </li>
+    }
+  </ul>
+</div>

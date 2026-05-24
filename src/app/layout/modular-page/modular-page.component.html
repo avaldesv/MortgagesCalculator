@@ -1,0 +1,24 @@
+<div class="modular-page">
+  <div class="modular-page__grid">
+    @for (position of positions; track position) {
+      @if (slotsFor(position); as placement) {
+        <div class="modular-page__ad-slot" [attr.data-ad-position]="position">
+          <app-listings-ad
+            [placement]="placement"
+            [monthlyPayment]="monthlyPayment()"
+          />
+        </div>
+      } @else {
+        <div
+          class="modular-page__ad-slot modular-page__ad-slot--empty"
+          [attr.data-ad-position]="position"
+          aria-hidden="true"
+        ></div>
+      }
+    }
+
+    <main class="modular-page__content">
+      <ng-content />
+    </main>
+  </div>
+</div>
