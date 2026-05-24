@@ -1,7 +1,6 @@
 # GATE-1 — OpenAPI v0.1 (borrador para revisión FE/BE)
 
-**Estado:** Borrador · pendiente PR + firma  
-**Acción:** Copiar el bloque YAML a `openapi-v0.1.yaml` o aprobar este MD como entregable interino.
+**Estado:** Superseded by [`openapi-v0.1.yaml`](./openapi-v0.1.yaml) — usar YAML canónico + [`GATE-1-signoff.md`](./GATE-1-signoff.md).
 
 ## Criterio de cierre GATE-1
 
@@ -112,6 +111,42 @@ paths:
         '409': { description: PLACEMENT_ID_CONFLICT }
 
   /api/v1/admin/ad-placements/{placementId}:
+    get:
+      tags: [AdPlacements]
+      security: [{ bearerAuth: [] }]
+      operationId: getAdPlacement
+      parameters:
+        - $ref: '#/components/parameters/PlacementIdPath'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdPlacement' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    patch:
+      tags: [AdPlacements]
+      security: [{ bearerAuth: [] }]
+      operationId: updateAdPlacement
+      parameters:
+        - $ref: '#/components/parameters/PlacementIdPath'
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AdPlacementUpdateRequest' }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdPlacement' }
+    delete:
+      tags: [AdPlacements]
+      security: [{ bearerAuth: [] }]
+      operationId: deleteAdPlacement
+      parameters:
+        - $ref: '#/components/parameters/PlacementIdPath'
+      responses:
+        '204': { description: Deleted }
+
   /api/v1/listings:
     get:
       tags: [Listings]
@@ -140,7 +175,57 @@ paths:
               schema: { $ref: '#/components/schemas/PaginatedListingsResponse' }
 
   /api/v1/admin/listings:
+    get:
+      tags: [Listings]
+      security: [{ bearerAuth: [] }]
+      operationId: listAdminListings
+      parameters:
+        - $ref: '#/components/parameters/PageQuery'
+        - $ref: '#/components/parameters/PageSizeQuery'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PaginatedListingsResponse' }
+    post:
+      tags: [Listings]
+      security: [{ bearerAuth: [] }]
+      operationId: createListing
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SponsoredListingCreateRequest' }
+      responses:
+        '201':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SponsoredListing' }
+
   /api/v1/admin/listings/{listingId}:
+    patch:
+      tags: [Listings]
+      security: [{ bearerAuth: [] }]
+      operationId: updateListing
+      parameters:
+        - $ref: '#/components/parameters/ListingIdPath'
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SponsoredListingUpdateRequest' }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SponsoredListing' }
+    delete:
+      tags: [Listings]
+      security: [{ bearerAuth: [] }]
+      operationId: deleteListing
+      parameters:
+        - $ref: '#/components/parameters/ListingIdPath'
+      responses:
+        '204': { description: Deleted }
+
   /api/v1/leads/partner:
     post:
       tags: [Leads]
@@ -159,7 +244,182 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+
+  parameters:
+    PlacementIdPath:
+      name: placementId
+      in: path
+      required: true
+      schema: { type: string, maxLength: 64 }
+    ListingIdPath:
+      name: listingId
+      in: path
+      required: true
+      schema: { type: string, maxLength: 64 }
+    PageQuery:
+      name: page
+      in: query
+      schema: { type: integer, minimum: 1, default: 1 }
+    PageSizeQuery:
+      name: pageSize
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid JWT
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    TooManyRequests:
+      description: Rate limit exceeded
+      headers:
+        Retry-After:
+          schema: { type: integer }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/RateLimitErrorResponse' }
+
   schemas:
+    HealthResponse:
+      type: object
+      required: [status, version, timestamp]
+      properties:
+        status: { enum: [ok, degraded] }
+        version: { type: string }
+        timestamp: { type: string, format: date-time }
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, minLength: 8, maxLength: 128 }
+    LoginResponse:
+      type: object
+      required: [accessToken, expiresIn, tokenType]
+      properties:
+        accessToken: { type: string }
+        expiresIn: { type: integer }
+        tokenType: { enum: [Bearer] }
+    ActiveAdPlacementsResponse:
+      type: object
+      required: [tabId, placements]
+      properties:
+        tabId: { $ref: '#/components/schemas/TabId' }
+        placements:
+          type: array
+          items: { $ref: '#/components/schemas/AdPlacement' }
+    AdPlacement:
+      type: object
+      required: [id, enabled, position, tabs]
+      properties:
+        id: { type: string }
+        enabled: { type: boolean }
+        position: { $ref: '#/components/schemas/AdPagePosition' }
+        tabs: { $ref: '#/components/schemas/TabsTarget' }
+        maxListings: { type: integer, minimum: 1, maximum: 12 }
+        sponsoredLabel: { type: string }
+        priority: { type: integer }
+        updatedAt: { type: string, format: date-time }
+    AdPlacementCreateRequest:
+      type: object
+      required: [id, enabled, position, tabs]
+      properties:
+        id: { type: string }
+        enabled: { type: boolean }
+        position: { $ref: '#/components/schemas/AdPagePosition' }
+        tabs: { $ref: '#/components/schemas/TabsTarget' }
+        maxListings: { type: integer, minimum: 1, maximum: 12 }
+        sponsoredLabel: { type: string }
+        priority: { type: integer }
+    AdPlacementUpdateRequest:
+      type: object
+      minProperties: 1
+      properties:
+        enabled: { type: boolean }
+        position: { $ref: '#/components/schemas/AdPagePosition' }
+        tabs: { $ref: '#/components/schemas/TabsTarget' }
+        maxListings: { type: integer, minimum: 1, maximum: 12 }
+        priority: { type: integer }
+    AdPlacementListResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: array
+          items: { $ref: '#/components/schemas/AdPlacement' }
+    TabsTarget:
+      oneOf:
+        - type: string
+          enum: [all]
+        - type: array
+          items: { $ref: '#/components/schemas/TabId' }
+    SponsoredListing:
+      type: object
+      required: [id, price, city, state, estimatedMonthlyPayment, bedrooms, bathrooms, squareFeet, agentOrCompany, listingUrl, active]
+      properties:
+        id: { type: string }
+        price: { type: number, minimum: 0 }
+        city: { type: string }
+        state: { type: string, minLength: 2, maxLength: 2 }
+        estimatedMonthlyPayment: { type: number, minimum: 0 }
+        bedrooms: { type: integer }
+        bathrooms: { type: number }
+        squareFeet: { type: integer }
+        agentOrCompany: { type: string }
+        listingUrl: { type: string, format: uri }
+        zip: { type: string }
+        active: { type: boolean }
+    SponsoredListingCreateRequest:
+      type: object
+      required: [price, city, state, estimatedMonthlyPayment, bedrooms, bathrooms, squareFeet, agentOrCompany, listingUrl]
+      properties:
+        price: { type: number }
+        city: { type: string }
+        state: { type: string }
+        estimatedMonthlyPayment: { type: number }
+        bedrooms: { type: integer }
+        bathrooms: { type: number }
+        squareFeet: { type: integer }
+        agentOrCompany: { type: string }
+        listingUrl: { type: string, format: uri }
+        zip: { type: string }
+        active: { type: boolean, default: true }
+    SponsoredListingUpdateRequest:
+      type: object
+      minProperties: 1
+      properties:
+        price: { type: number }
+        active: { type: boolean }
+    PaginatedListingsResponse:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: array
+          items: { $ref: '#/components/schemas/SponsoredListing' }
+        meta:
+          type: object
+          required: [page, pageSize, total]
+          properties:
+            page: { type: integer }
+            pageSize: { type: integer }
+            total: { type: integer }
+    ServiceType:
+      type: string
+      enum: [real_estate_agent, mortgage_broker, mortgage_lender, insurance, moving, home_warranty, solar, internet, title, home_inspector, other]
+    PartnerLeadResponse:
+      type: object
+      required: [id, status, createdAt]
+      properties:
+        id: { type: string }
+        status: { enum: [received] }
+        createdAt: { type: string, format: date-time }
     TabId:
       type: string
       enum: [simple-calculator, advanced-calculator, affordability, compare-scenarios, homes-by-payment, learning-center, partners]
@@ -188,7 +448,19 @@ components:
         consentContact: { type: boolean, description: Must be true }
 ```
 
-> **Nota:** El YAML completo con todos los paths, ejemplos y schemas está en la sección siguiente (versión extendida). Para PR, usar el archivo generado desde agent mode como `openapi-v0.1.yaml`.
+**Post-revisión:** renombrar bloque a `docs/api/openapi-v0.1.yaml` (requiere modo Agent o copia manual).
+
+### Ownership FE / BE
+
+| Recurso | FE | BE |
+|---------|----|----|
+| Health | — | BE |
+| Auth login | Admin UI | BE |
+| Ad placements active | ModularPageLayout | BE |
+| Ad placements admin | Admin UI | BE |
+| Listings public | Homes, M-listings-ad | BE |
+| Listings admin | Admin UI | BE |
+| Partner leads | Partners tab | BE |
 
 ---
 
