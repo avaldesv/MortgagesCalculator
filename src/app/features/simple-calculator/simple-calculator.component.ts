@@ -1,8 +1,9 @@
 import { CurrencyPipe } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { SimpleCalculatorInput } from '../../core/models/mortgage.model';
+import { CalculatorStateService } from '../../core/services/calculator-state.service';
 import { MortgageCalculatorService } from '../../core/services/mortgage-calculator.service';
 import { ModularPageComponent } from '../../layout/modular-page/modular-page.component';
 import { PaymentBarComponent } from '../../shared/payment-bar/payment-bar.component';
@@ -22,17 +23,44 @@ import { PaymentDonutComponent } from '../../shared/payment-donut/payment-donut.
   templateUrl: './simple-calculator.component.html',
   styleUrl: './simple-calculator.component.scss',
 })
-export class SimpleCalculatorComponent {
+export class SimpleCalculatorComponent implements OnInit {
   private readonly calc = inject(MortgageCalculatorService);
+  private readonly sharedState = inject(CalculatorStateService);
 
-  readonly input = signal<SimpleCalculatorInput>(this.calc.defaultInput());
+  readonly input = signal<SimpleCalculatorInput>(this.buildInputFromState());
   readonly result = computed(() => this.calc.calculateSimple(this.input()));
   readonly downPaymentAmount = computed(
     () => Math.round(this.input().homePrice * (this.input().downPaymentPercent / 100)),
   );
 
+  private buildInputFromState(): SimpleCalculatorInput {
+    const s = this.sharedState.getSnapshot();
+    const base = this.calc.defaultInput();
+    return {
+      ...base,
+      homePrice: s.homePrice,
+      downPaymentPercent: s.downPaymentPercent,
+      interestRate: s.interestRate,
+      loanTermYears: s.loanTermYears,
+    };
+  }
+
+  private syncToSharedState(): void {
+    const i = this.input();
+    const r = this.result();
+    this.sharedState.patch({
+      homePrice: i.homePrice,
+      downPaymentPercent: i.downPaymentPercent,
+      interestRate: i.interestRate,
+      loanTermYears: i.loanTermYears,
+      monthlyPayment: r.monthlyPayment,
+      loanAmount: r.loanAmount,
+    });
+  }
+
   update<K extends keyof SimpleCalculatorInput>(key: K, value: SimpleCalculatorInput[K]): void {
     this.input.update((prev) => ({ ...prev, [key]: value }));
+    this.syncToSharedState();
   }
 
   onNumberChange(key: keyof SimpleCalculatorInput, raw: string): void {
@@ -44,6 +72,10 @@ export class SimpleCalculatorComponent {
     if (key === 'interestRate') v = Math.min(30, Math.max(0, v));
     if (key === 'loanTermYears' && v !== 15 && v !== 20 && v !== 30) return;
     this.update(key, v as SimpleCalculatorInput[typeof key]);
+  }
+
+  ngOnInit(): void {
+    this.syncToSharedState();
   }
 
   scrollToResults(): void {

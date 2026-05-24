@@ -21,4 +21,17 @@
 | P0-A-10 | AVV-33 | Branding UI |
 | P0-A-11 | AVV-34 | Railway staging |
 
-Marcar **AVV-20** y **AVV-21** como Done tras confirmar `main` en GitHub con docs gates.
+### P0-A (Done en Linear 2026-05-24)
+
+AVV-20 … AVV-34 — gates + epic P0-A + 11 entregables.
+
+### P0-B — CalculatorStateService (Done en Linear 2026-05-24)
+
+| Issue | ID |
+|-------|-----|
+| Epic prereq tabs | AVV-35 |
+| ST-01 signals + API | AVV-36 |
+| ST-02 sessionStorage | AVV-37 |
+| ST-03 Simple integration | AVV-38 |
+
+Scripts: `node scripts/linear-update-issues.mjs --done AVV-XX` · `--in-progress AVV-XX`

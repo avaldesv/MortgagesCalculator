@@ -8,7 +8,9 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint:openapi": "npx --yes @redocly/cli@1 lint docs/api/openapi-v0.1.yaml",
-    "linear:bootstrap": "node scripts/linear-bootstrap.mjs"
+    "linear:bootstrap": "node scripts/linear-bootstrap.mjs",
+    "linear:done": "node scripts/linear-update-issues.mjs --done",
+    "linear:progress": "node scripts/linear-update-issues.mjs --in-progress"
   },
   "private": true,
   "dependencies": {

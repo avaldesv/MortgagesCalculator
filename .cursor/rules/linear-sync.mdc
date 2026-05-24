@@ -1,0 +1,24 @@
+---
+description: Keep Linear issue status in sync with implementation work
+alwaysApply: true
+---
+
+# Linear sync (MortgageCalc)
+
+When starting, completing, or blocking work:
+
+1. Update the matching Linear issue (project **MortgageCalc**, team **AVV**).
+2. Use repo scripts (requires `LINEAR_API_KEY` in env or `.env.local`, never commit the key):
+
+```powershell
+# Mark done
+node scripts/linear-update-issues.mjs --done AVV-XX
+
+# Mark in progress
+node scripts/linear-update-issues.mjs --in-progress AVV-XX
+```
+
+3. Default batch close for P0-A gates/issues is in `linear-update-issues.mjs` (no args).
+4. After creating new issues, document identifiers in `docs/linear/BOOTSTRAP-RESULT.md`.
+
+States: **In Progress** when coding starts; **Done** when merged to `main` and acceptance criteria met.
