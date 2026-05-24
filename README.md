@@ -49,7 +49,7 @@ git init
 git add .
 git commit -m "feat: Angular Coastal Fintech mortgage calculator"
 git branch -M main
-git remote add origin https://github.com/YOUR_USER/MortgageCalculator3.git
+git remote add origin https://github.com/avaldesv/MortgagesCalculator.git
 git push -u origin main
 ```
 
