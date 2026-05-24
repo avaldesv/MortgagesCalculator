@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint:openapi": "redocly lint docs/api/openapi-v0.1.yaml",
+    "lint:openapi": "npx --yes @redocly/cli@1 lint docs/api/openapi-v0.1.yaml",
     "linear:bootstrap": "node scripts/linear-bootstrap.mjs"
   },
   "private": true,

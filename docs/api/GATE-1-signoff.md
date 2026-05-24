@@ -24,8 +24,8 @@
 
 ## Cierre
 
-- [ ] PR mergeado a `main`
-- [ ] `servers[0].url` actualizado al URL Railway API real (o documentado en Linear como pendiente P0-A staging)
-- [ ] Issue Linear `[GATE-1]` → Done
+- [x] PR mergeado a `main` (rama `docs/gates-0-1`)
+- [ ] `servers[0].url` actualizado al URL Railway API real (pendiente P0-A-11 staging)
+- [ ] Issue Linear `[GATE-1]` → Done (AVV-21)
 
 **Gate cerrado cuando las tres filas de Cierre están marcadas.**

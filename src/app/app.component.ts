@@ -11,7 +11,10 @@ import { SiteHeaderComponent } from './layout/site-header/site-header.component'
       <app-site-header />
       <router-outlet />
       <footer class="site-footer">
-        <p>© {{ year }} MortgageCalc · Estimates only, not a loan offer.</p>
+        <p>
+          © {{ year }} MortgageCalc · Estimates only, not a loan offer.
+          Educational calculator — not a loan offer or financial advice.
+        </p>
       </footer>
     </div>
   `,

@@ -1,3 +1,10 @@
+.payment-disclaimer {
+  margin: 0.75rem 0 0;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--color-muted);
+}
+
 .hero {
   margin-bottom: 1.25rem;
 
@@ -21,6 +28,14 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
+}
+
+.payment-disclaimer {
+  margin: 0.75rem 0 0;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--color-muted);
+  max-width: 42ch;
 }
 
 .calculator-grid {
