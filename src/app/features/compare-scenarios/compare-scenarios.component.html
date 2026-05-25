@@ -1,0 +1,80 @@
+<app-modular-page tabId="compare-scenarios" [monthlyPayment]="thirtyYearPayment()">
+  <section class="hero card">
+    <h1>Compare Mortgage Scenarios</h1>
+    <p class="hero__sub">
+      Side-by-side 15, 20, and 30-year terms using the same home price, down payment, and rate.
+    </p>
+  </section>
+
+  <form class="card calculator-form" (submit)="$event.preventDefault()">
+    <h2 class="card__title">Shared loan inputs</h2>
+    <div class="input-row">
+      <label class="field">
+        <span>Home price</span>
+        <input type="number" [ngModel]="input().homePrice" (ngModelChange)="onNumberChange('homePrice', $event)" name="price" min="0" step="1000" />
+      </label>
+      <label class="field">
+        <span>Down payment (%)</span>
+        <input type="number" [ngModel]="input().downPaymentPercent" (ngModelChange)="onNumberChange('downPaymentPercent', $event)" name="down" min="0" max="100" step="0.5" />
+      </label>
+      <label class="field">
+        <span>Interest rate (%)</span>
+        <input type="number" [ngModel]="input().interestRate" (ngModelChange)="onNumberChange('interestRate', $event)" name="rate" min="0" max="30" step="0.125" />
+      </label>
+    </div>
+  </form>
+
+  <section class="card">
+    <h2 class="card__title">Scenario comparison</h2>
+    <div class="compare-table-wrap">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Term</th>
+            <th>Monthly payment</th>
+            <th>Principal &amp; interest</th>
+            <th>Total interest</th>
+            <th>Payoff year</th>
+            <th>Interest saved vs 30-yr</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of comparison().rows; track row.termYears) {
+            <tr [class.compare-table__highlight]="row.termYears === 15">
+              <td>{{ row.label }}</td>
+              <td>{{ row.mortgage.monthlyPayment | currency }}</td>
+              <td>{{ row.mortgage.principalAndInterest | currency }}</td>
+              <td>{{ row.mortgage.totalInterest | currency }}</td>
+              <td>{{ row.mortgage.payoffYear }}</td>
+              <td>
+                @if (row.termYears === 30) {
+                  <span class="muted">Baseline</span>
+                } @else {
+                  {{ row.interestSavedVs30 | currency }}
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <p class="table-note">Taxes, insurance, PMI, and HOA use the same assumptions as the Simple Calculator defaults.</p>
+  </section>
+
+  <section class="card">
+    <h2 class="card__title">Interest saved vs 30-year (lifetime)</h2>
+    <div class="savings-chart">
+      @for (row of comparison().rows; track row.termYears) {
+        @if (row.termYears !== 30) {
+          <div class="savings-chart__row">
+            <span class="savings-chart__label">{{ row.termYears }} yr</span>
+            <div class="savings-chart__track">
+              <div class="savings-chart__fill" [style.width.%]="savingsBarHeight(row.interestSavedVs30)"></div>
+            </div>
+            <span class="savings-chart__value">{{ row.interestSavedVs30 | currency: 'USD' : 'symbol' : '1.0-0' }}</span>
+          </div>
+        }
+      }
+    </div>
+  </section>
+</app-modular-page>

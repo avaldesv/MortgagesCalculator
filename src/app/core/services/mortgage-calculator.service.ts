@@ -5,6 +5,8 @@ import {
   AffordabilityComfort,
   AffordabilityInput,
   AffordabilityResult,
+  CompareScenarioRow,
+  CompareScenariosResult,
   AmortizationRow,
   AmortizationYearSummary,
   DEFAULT_SIMPLE_INPUT,
@@ -70,6 +72,21 @@ export class MortgageCalculatorService {
 
   defaultInput(): SimpleCalculatorInput {
     return { ...DEFAULT_SIMPLE_INPUT };
+  }
+
+  compareScenarios(input: SimpleCalculatorInput): CompareScenariosResult {
+    const terms: Array<15 | 20 | 30> = [15, 20, 30];
+    const baseline = this.calculateSimple({ ...input, loanTermYears: 30 });
+    const rows: CompareScenarioRow[] = terms.map((termYears) => {
+      const mortgage = this.calculateSimple({ ...input, loanTermYears: termYears });
+      return {
+        termYears,
+        label: `${termYears}-year fixed`,
+        mortgage,
+        interestSavedVs30: Math.max(0, baseline.totalInterest - mortgage.totalInterest),
+      };
+    });
+    return { input, rows };
   }
 
   calculateAffordability(input: AffordabilityInput): AffordabilityResult {

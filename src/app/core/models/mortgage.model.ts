@@ -101,6 +101,19 @@ export interface AffordabilityResult {
   affordabilityScore: number;
 }
 
+export interface CompareScenarioRow {
+  termYears: 15 | 20 | 30;
+  label: string;
+  mortgage: MortgageResult;
+  /** Total interest saved vs 30-year baseline (0 for baseline row). */
+  interestSavedVs30: number;
+}
+
+export interface CompareScenariosResult {
+  input: SimpleCalculatorInput;
+  rows: CompareScenarioRow[];
+}
+
 export const DEFAULT_AFFORDABILITY_INPUT: AffordabilityInput = {
   annualGrossIncome: 120_000,
   monthlyDebtPayments: 450,

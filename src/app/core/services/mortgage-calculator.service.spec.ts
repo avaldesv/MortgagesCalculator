@@ -122,4 +122,18 @@ describe('MortgageCalculatorService', () => {
     expect(result.affordableHomePrice).toBeGreaterThan(100_000);
     expect(result.affordabilityScore).toBeGreaterThan(0);
   });
+
+  it('shows lower total interest for shorter loan terms', () => {
+    const { rows } = service.compareScenarios({
+      ...DEFAULT_SIMPLE_INPUT,
+      homePrice: 400_000,
+      downPaymentPercent: 20,
+      interestRate: 6.5,
+    });
+    const r15 = rows.find((r) => r.termYears === 15)!;
+    const r30 = rows.find((r) => r.termYears === 30)!;
+    expect(r15.mortgage.totalInterest).toBeLessThan(r30.mortgage.totalInterest);
+    expect(r15.interestSavedVs30).toBeGreaterThan(0);
+    expect(r30.interestSavedVs30).toBe(0);
+  });
 });
