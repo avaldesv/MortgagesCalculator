@@ -33,6 +33,10 @@ Sin `DATABASE_URL` la API usa JSON en `data/` (válido para prueba rápida, no r
 
 El `Dockerfile` del web ejecuta `scripts/generate-environment.mjs` antes de `ng build`.
 
+## Build OOM (exit code 137)
+
+Si el deploy del servicio **API** falla en `RUN npm ci` con **exit 137**, Railway se quedó sin RAM en el build. El `backend/Dockerfile` usa una sola etapa y `npm ci --ignore-scripts` para reducir memoria. Si sigue fallando, en Railway → Service → **Settings** aumenta recursos del builder o redeploy.
+
 ## 4. Build & deploy
 
 1. Conectar repo GitHub `avaldesv/MortgagesCalculator`, rama `main`.
