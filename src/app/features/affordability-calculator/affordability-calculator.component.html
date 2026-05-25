@@ -1,0 +1,117 @@
+<app-modular-page tabId="affordability" [monthlyPayment]="input().currentMonthlyHousing">
+  <section class="hero card">
+    <h1>Affordability Calculator</h1>
+    <p class="hero__sub">
+      Estimate how much home you can afford using common 28% / 36% debt-to-income guidelines.
+    </p>
+    <a routerLink="/simple-calculator" class="btn btn--secondary">Update payment in Simple Calculator</a>
+  </section>
+
+  <div class="calculator-grid">
+    <form class="card calculator-form" (submit)="$event.preventDefault()">
+      <h2 class="card__title">Your finances</h2>
+
+      <label class="field">
+        <span>Annual gross income</span>
+        <input type="number" [ngModel]="input().annualGrossIncome" (ngModelChange)="onNumberChange('annualGrossIncome', $event)" name="income" min="0" step="1000" />
+      </label>
+
+      <label class="field">
+        <span>Monthly debt payments (non-housing)</span>
+        <input type="number" [ngModel]="input().monthlyDebtPayments" (ngModelChange)="onNumberChange('monthlyDebtPayments', $event)" name="debts" min="0" step="50" />
+      </label>
+
+      <label class="field">
+        <span>Current monthly housing payment</span>
+        <input type="number" [ngModel]="input().currentMonthlyHousing" (ngModelChange)="onNumberChange('currentMonthlyHousing', $event)" name="housing" min="0" step="50" />
+        <span class="field__hint">Synced from Simple Calculator when available.</span>
+      </label>
+
+      <h2 class="card__title">Loan assumptions</h2>
+
+      <label class="field">
+        <span>Down payment (%)</span>
+        <input type="number" [ngModel]="input().downPaymentPercent" (ngModelChange)="onNumberChange('downPaymentPercent', $event)" name="down" min="0" max="100" step="0.5" />
+      </label>
+
+      <label class="field">
+        <span>Interest rate (%)</span>
+        <input type="number" [ngModel]="input().interestRate" (ngModelChange)="onNumberChange('interestRate', $event)" name="rate" min="0" max="30" step="0.125" />
+      </label>
+
+      <fieldset class="field">
+        <span>Loan term</span>
+        <div class="term-options">
+          @for (term of [15, 20, 30]; track term) {
+            <label class="term-option">
+              <input type="radio" name="term" [value]="term" [checked]="input().loanTermYears === term" (change)="setLoanTerm(term)" />
+              {{ term }} years
+            </label>
+          }
+        </div>
+      </fieldset>
+
+      <label class="field">
+        <span>Property tax (% of home value / year)</span>
+        <input type="number" [ngModel]="input().propertyTaxRatePercent" (ngModelChange)="onNumberChange('propertyTaxRatePercent', $event)" name="taxRate" min="0" max="10" step="0.01" />
+      </label>
+
+      <label class="field">
+        <span>Insurance (% of home value / year)</span>
+        <input type="number" [ngModel]="input().insuranceRatePercent" (ngModelChange)="onNumberChange('insuranceRatePercent', $event)" name="insRate" min="0" max="10" step="0.01" />
+      </label>
+
+      <label class="field">
+        <span>HOA (monthly)</span>
+        <input type="number" [ngModel]="input().hoaMonthly" (ngModelChange)="onNumberChange('hoaMonthly', $event)" name="hoa" min="0" />
+      </label>
+    </form>
+
+    <div class="results-stack">
+      <section class="card score-card" [class]="'score-card--' + result().comfort">
+        <p class="score-card__label">Affordability score</p>
+        <p class="score-card__value">{{ result().affordabilityScore }}</p>
+        <p class="score-card__status">{{ comfortLabel() }}</p>
+        <div class="comfort-meter" role="meter" [attr.aria-valuenow]="result().affordabilityScore" aria-valuemin="0" aria-valuemax="100">
+          <div class="comfort-meter__fill" [style.width.%]="result().affordabilityScore"></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2 class="card__title">Debt-to-income</h2>
+        <div class="dti-row">
+          <span>Front-end (housing only)</span>
+          <strong>{{ result().frontEndDtiPercent | number: '1.0-1' }}%</strong>
+        </div>
+        <div class="dti-meter">
+          <div class="dti-meter__fill" [style.width.%]="meterWidth(result().frontEndDtiPercent, 45)"></div>
+        </div>
+        <p class="dti-hint">Guideline max 28%</p>
+
+        <div class="dti-row">
+          <span>Back-end (housing + debts)</span>
+          <strong>{{ result().backEndDtiPercent | number: '1.0-1' }}%</strong>
+        </div>
+        <div class="dti-meter dti-meter--back">
+          <div class="dti-meter__fill" [style.width.%]="meterWidth(result().backEndDtiPercent, 50)"></div>
+        </div>
+        <p class="dti-hint">Guideline max 36%</p>
+      </section>
+
+      <section class="card payment-hero">
+        <p class="payment-hero__label">Recommended max housing payment</p>
+        <p class="payment-hero__amount">{{ result().recommendedMaxPayment | currency: 'USD' : 'symbol' : '1.0-0' }}<span class="payment-hero__suffix">/mo</span></p>
+        <p class="payment-disclaimer">Estimates only. Lenders may use different limits.</p>
+      </section>
+
+      <section class="card">
+        <h2 class="card__title">Affordable home price (estimate)</h2>
+        <p class="price-estimate">{{ result().affordableHomePrice | currency: 'USD' : 'symbol' : '1.0-0' }}</p>
+        <p class="range-note">
+          Comfortable band: up to {{ result().grossMonthlyIncome * 0.25 | currency: 'USD' : 'symbol' : '1.0-0' }}/mo housing
+          (25% front-end).
+        </p>
+      </section>
+    </div>
+  </div>
+</app-modular-page>

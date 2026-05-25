@@ -30,6 +30,32 @@ export interface MortgageResult {
   breakdown: PaymentBreakdownItem[];
 }
 
+export interface AdvancedCalculatorInput extends SimpleCalculatorInput {
+  extraMonthlyPayment: number;
+}
+
+export interface AmortizationRow {
+  month: number;
+  payment: number;
+  principal: number;
+  interest: number;
+  extraPrincipal: number;
+  balance: number;
+}
+
+export interface AmortizationYearSummary {
+  year: number;
+  principalPaid: number;
+  interestPaid: number;
+  endBalance: number;
+}
+
+export interface AdvancedCalculatorResult {
+  mortgage: MortgageResult;
+  schedule: AmortizationRow[];
+  yearlySummary: AmortizationYearSummary[];
+}
+
 export const DEFAULT_SIMPLE_INPUT: SimpleCalculatorInput = {
   homePrice: 425000,
   downPaymentPercent: 20,
@@ -39,4 +65,50 @@ export const DEFAULT_SIMPLE_INPUT: SimpleCalculatorInput = {
   insuranceAnnual: 1800,
   pmiMonthly: 0,
   hoaMonthly: 0,
+};
+
+export const DEFAULT_ADVANCED_INPUT: AdvancedCalculatorInput = {
+  ...DEFAULT_SIMPLE_INPUT,
+  extraMonthlyPayment: 0,
+};
+
+export interface AffordabilityInput {
+  annualGrossIncome: number;
+  monthlyDebtPayments: number;
+  downPaymentPercent: number;
+  interestRate: number;
+  loanTermYears: 15 | 20 | 30;
+  /** Annual property tax as % of home price */
+  propertyTaxRatePercent: number;
+  /** Annual insurance as % of home price */
+  insuranceRatePercent: number;
+  hoaMonthly: number;
+  /** Housing payment to score (often from shared calculator state) */
+  currentMonthlyHousing: number;
+}
+
+export type AffordabilityComfort = 'comfortable' | 'stretch' | 'over';
+
+export interface AffordabilityResult {
+  grossMonthlyIncome: number;
+  frontEndDtiPercent: number;
+  backEndDtiPercent: number;
+  maxHousingPaymentFront: number;
+  maxHousingPaymentBack: number;
+  recommendedMaxPayment: number;
+  affordableHomePrice: number;
+  comfort: AffordabilityComfort;
+  affordabilityScore: number;
+}
+
+export const DEFAULT_AFFORDABILITY_INPUT: AffordabilityInput = {
+  annualGrossIncome: 120_000,
+  monthlyDebtPayments: 450,
+  downPaymentPercent: 20,
+  interestRate: 6.75,
+  loanTermYears: 30,
+  propertyTaxRatePercent: 1.27,
+  insuranceRatePercent: 0.42,
+  hoaMonthly: 0,
+  currentMonthlyHousing: 0,
 };

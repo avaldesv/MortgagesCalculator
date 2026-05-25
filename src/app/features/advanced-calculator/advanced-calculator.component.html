@@ -1,0 +1,162 @@
+<app-modular-page tabId="advanced-calculator" [monthlyPayment]="result().mortgage.monthlyPayment">
+  <section class="hero card">
+    <h1>Advanced Mortgage Calculator</h1>
+    <p class="hero__sub">
+      Full loan inputs, amortization schedule, and yearly principal vs interest charts.
+    </p>
+    <button type="button" class="btn btn--secondary btn--disabled" disabled title="Coming in a future release">
+      Export PDF / Email — Coming soon
+    </button>
+  </section>
+
+  <div class="calculator-grid">
+    <form class="card calculator-form" (submit)="$event.preventDefault()">
+      <h2 class="card__title">Loan details</h2>
+
+      <label class="field">
+        <span>Home Price</span>
+        <input type="number" [ngModel]="input().homePrice" (ngModelChange)="onNumberChange('homePrice', $event)" name="homePrice" min="0" step="1000" />
+      </label>
+
+      <label class="field">
+        <span>Down Payment (%)</span>
+        <input type="number" [ngModel]="input().downPaymentPercent" (ngModelChange)="onNumberChange('downPaymentPercent', $event)" name="down" min="0" max="100" step="0.5" />
+      </label>
+
+      <label class="field">
+        <span>Interest Rate (%)</span>
+        <input type="number" [ngModel]="input().interestRate" (ngModelChange)="onNumberChange('interestRate', $event)" name="rate" min="0" max="30" step="0.125" />
+      </label>
+
+      <fieldset class="field">
+        <span>Loan Term</span>
+        <div class="term-options">
+          @for (term of [15, 20, 30]; track term) {
+            <label class="term-option">
+              <input type="radio" name="term" [value]="term" [checked]="input().loanTermYears === term" (change)="setLoanTerm(term)" />
+              {{ term }} years
+            </label>
+          }
+        </div>
+      </fieldset>
+
+      <label class="field">
+        <span>Property Tax (annual)</span>
+        <input type="number" [ngModel]="input().propertyTaxAnnual" (ngModelChange)="onNumberChange('propertyTaxAnnual', $event)" name="tax" min="0" />
+      </label>
+
+      <label class="field">
+        <span>Home Insurance (annual)</span>
+        <input type="number" [ngModel]="input().insuranceAnnual" (ngModelChange)="onNumberChange('insuranceAnnual', $event)" name="insurance" min="0" />
+      </label>
+
+      <label class="field">
+        <span>PMI (monthly)</span>
+        <input type="number" [ngModel]="input().pmiMonthly" (ngModelChange)="onNumberChange('pmiMonthly', $event)" name="pmi" min="0" />
+      </label>
+
+      <label class="field">
+        <span>HOA (monthly)</span>
+        <input type="number" [ngModel]="input().hoaMonthly" (ngModelChange)="onNumberChange('hoaMonthly', $event)" name="hoa" min="0" />
+      </label>
+
+      <label class="field">
+        <span>Extra monthly payment (principal)</span>
+        <input type="number" [ngModel]="input().extraMonthlyPayment" (ngModelChange)="onNumberChange('extraMonthlyPayment', $event)" name="extra" min="0" step="50" />
+      </label>
+    </form>
+
+    <div class="results-stack">
+      <div class="card payment-hero">
+        <p class="payment-hero__label">Estimated Monthly Payment</p>
+        <p class="payment-hero__amount">
+          {{ result().mortgage.monthlyPayment | currency: 'USD' : 'symbol' : '1.0-0' }}
+          <span class="payment-hero__suffix">/mo</span>
+        </p>
+        <p class="payment-disclaimer" role="note">
+          <strong>Estimates only.</strong> Amortization reflects P&amp;I plus optional extra toward principal.
+        </p>
+      </div>
+
+      <div class="card">
+        <h3 class="card__title">Payment breakdown</h3>
+        <app-payment-donut [breakdown]="result().mortgage.breakdown" />
+        <app-payment-bar [breakdown]="result().mortgage.breakdown" />
+      </div>
+
+      <div class="card">
+        <h3 class="card__title">Principal vs interest by year</h3>
+        <div class="year-chart" role="img" aria-label="Yearly principal and interest paid">
+          @for (y of result().yearlySummary; track y.year) {
+            <div class="year-chart__col">
+              <div class="year-chart__bars">
+                <div
+                  class="year-chart__bar year-chart__bar--principal"
+                  [style.height.%]="yearBarHeight(y.principalPaid, maxYearlyPrincipal())"
+                ></div>
+                <div
+                  class="year-chart__bar year-chart__bar--interest"
+                  [style.height.%]="yearBarHeight(y.interestPaid, maxYearlyInterest())"
+                ></div>
+              </div>
+              <span class="year-chart__label">Y{{ y.year }}</span>
+            </div>
+          }
+        </div>
+        <p class="chart-legend">
+          <span class="chart-legend__swatch chart-legend__swatch--principal"></span> Principal
+          <span class="chart-legend__swatch chart-legend__swatch--interest"></span> Interest
+        </p>
+      </div>
+
+      <div class="card">
+        <h3 class="card__title">Remaining balance by year</h3>
+        <div class="balance-chart">
+          @for (y of result().yearlySummary; track y.year) {
+            <div class="balance-chart__row">
+              <span>Year {{ y.year }}</span>
+              <div class="balance-chart__track">
+                <div
+                  class="balance-chart__fill"
+                  [style.width.%]="(y.endBalance / result().mortgage.loanAmount) * 100"
+                ></div>
+              </div>
+              <span>{{ y.endBalance | currency: 'USD' : 'symbol' : '1.0-0' }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card__title">Amortization schedule (first 12 months)</h3>
+        <div class="amort-table-wrap">
+          <table class="amort-table">
+            <thead>
+              <tr>
+                <th>Mo</th>
+                <th>Payment</th>
+                <th>Principal</th>
+                <th>Interest</th>
+                <th>Extra</th>
+                <th>Balance</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of schedulePreview(); track row.month) {
+                <tr>
+                  <td>{{ row.month }}</td>
+                  <td>{{ row.payment | currency: 'USD' : 'symbol' : '1.0-0' }}</td>
+                  <td>{{ row.principal + row.extraPrincipal | currency: 'USD' : 'symbol' : '1.0-0' }}</td>
+                  <td>{{ row.interest | currency: 'USD' : 'symbol' : '1.0-0' }}</td>
+                  <td>{{ row.extraPrincipal | currency: 'USD' : 'symbol' : '1.0-0' }}</td>
+                  <td>{{ row.balance | currency: 'USD' : 'symbol' : '1.0-0' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <p class="table-note">Full schedule available in a future export (PDF).</p>
+      </div>
+    </div>
+  </div>
+</app-modular-page>

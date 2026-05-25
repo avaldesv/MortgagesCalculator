@@ -1,10 +1,22 @@
 import { Injectable } from '@angular/core';
 import {
+  AdvancedCalculatorInput,
+  AdvancedCalculatorResult,
+  AffordabilityComfort,
+  AffordabilityInput,
+  AffordabilityResult,
+  AmortizationRow,
+  AmortizationYearSummary,
   DEFAULT_SIMPLE_INPUT,
   MortgageResult,
   PaymentBreakdownItem,
   SimpleCalculatorInput,
 } from '../models/mortgage.model';
+
+const FRONT_END_DTI = 0.28;
+const BACK_END_DTI = 0.36;
+const COMFORT_FRONT_DTI = 0.25;
+const COMFORT_BACK_DTI = 0.33;
 
 @Injectable({ providedIn: 'root' })
 export class MortgageCalculatorService {
@@ -58,6 +70,179 @@ export class MortgageCalculatorService {
 
   defaultInput(): SimpleCalculatorInput {
     return { ...DEFAULT_SIMPLE_INPUT };
+  }
+
+  calculateAffordability(input: AffordabilityInput): AffordabilityResult {
+    const grossMonthlyIncome = Math.max(0, input.annualGrossIncome) / 12;
+    const debts = Math.max(0, input.monthlyDebtPayments);
+    const housing = Math.max(0, input.currentMonthlyHousing);
+
+    const maxHousingPaymentFront = grossMonthlyIncome * FRONT_END_DTI;
+    const maxHousingPaymentBack = Math.max(0, grossMonthlyIncome * BACK_END_DTI - debts);
+    const recommendedMaxPayment = Math.min(maxHousingPaymentFront, maxHousingPaymentBack);
+
+    const frontEndDtiPercent =
+      grossMonthlyIncome > 0 ? (housing / grossMonthlyIncome) * 100 : 0;
+    const backEndDtiPercent =
+      grossMonthlyIncome > 0 ? ((housing + debts) / grossMonthlyIncome) * 100 : 0;
+
+    const affordableHomePrice = this.estimateMaxHomePrice(input, recommendedMaxPayment);
+    const comfort = this.affordabilityComfort(
+      grossMonthlyIncome,
+      housing,
+      debts,
+    );
+    const affordabilityScore = this.affordabilityScore(
+      frontEndDtiPercent,
+      backEndDtiPercent,
+      comfort,
+    );
+
+    return {
+      grossMonthlyIncome,
+      frontEndDtiPercent,
+      backEndDtiPercent,
+      maxHousingPaymentFront,
+      maxHousingPaymentBack,
+      recommendedMaxPayment,
+      affordableHomePrice,
+      comfort,
+      affordabilityScore,
+    };
+  }
+
+  calculateAdvanced(input: AdvancedCalculatorInput): AdvancedCalculatorResult {
+    const mortgage = this.calculateSimple(input);
+    const schedule = this.buildAmortizationSchedule(
+      mortgage.loanAmount,
+      input.interestRate,
+      input.loanTermYears,
+      mortgage.principalAndInterest,
+      Math.max(0, input.extraMonthlyPayment),
+    );
+    const yearlySummary = this.summarizeByYear(schedule);
+    return { mortgage, schedule, yearlySummary };
+  }
+
+  buildAmortizationSchedule(
+    loanAmount: number,
+    annualRatePercent: number,
+    years: number,
+    monthlyPi: number,
+    extraMonthly: number,
+  ): AmortizationRow[] {
+    if (loanAmount <= 0) return [];
+
+    const r = annualRatePercent / 100 / 12;
+    const maxMonths = years * 12;
+    const rows: AmortizationRow[] = [];
+    let balance = loanAmount;
+
+    for (let month = 1; month <= maxMonths && balance > 0.01; month++) {
+      const interest = balance * r;
+      let principal = monthlyPi - interest;
+      if (principal < 0) principal = 0;
+      const extra = Math.min(extraMonthly, Math.max(0, balance - principal));
+      const totalPrincipal = Math.min(balance, principal + extra);
+      const payment = interest + totalPrincipal;
+      balance = Math.max(0, balance - totalPrincipal);
+
+      rows.push({
+        month,
+        payment,
+        principal: totalPrincipal - extra,
+        interest,
+        extraPrincipal: extra,
+        balance,
+      });
+    }
+
+    return rows;
+  }
+
+  private summarizeByYear(schedule: AmortizationRow[]): AmortizationYearSummary[] {
+    const byYear = new Map<number, AmortizationYearSummary>();
+    for (const row of schedule) {
+      const year = Math.ceil(row.month / 12);
+      const existing = byYear.get(year) ?? {
+        year,
+        principalPaid: 0,
+        interestPaid: 0,
+        endBalance: row.balance,
+      };
+      existing.principalPaid += row.principal + row.extraPrincipal;
+      existing.interestPaid += row.interest;
+      existing.endBalance = row.balance;
+      byYear.set(year, existing);
+    }
+    return [...byYear.values()];
+  }
+
+  private estimateMaxHomePrice(input: AffordabilityInput, maxMonthlyPayment: number): number {
+    if (maxMonthlyPayment <= 0) return 0;
+
+    let low = 0;
+    let high = 5_000_000;
+    for (let i = 0; i < 40; i++) {
+      const mid = (low + high) / 2;
+      const payment = this.monthlyHousingForPrice(mid, input);
+      if (payment <= maxMonthlyPayment) {
+        low = mid;
+      } else {
+        high = mid;
+      }
+    }
+    return Math.round(low);
+  }
+
+  private monthlyHousingForPrice(homePrice: number, input: AffordabilityInput): number {
+    const propertyTaxAnnual = homePrice * (input.propertyTaxRatePercent / 100);
+    const insuranceAnnual = homePrice * (input.insuranceRatePercent / 100);
+    const pmiMonthly =
+      input.downPaymentPercent < 20
+        ? Math.max(0, homePrice * (1 - input.downPaymentPercent / 100) * 0.005 / 12)
+        : 0;
+    return this.calculateSimple({
+      homePrice,
+      downPaymentPercent: input.downPaymentPercent,
+      interestRate: input.interestRate,
+      loanTermYears: input.loanTermYears,
+      propertyTaxAnnual,
+      insuranceAnnual,
+      pmiMonthly,
+      hoaMonthly: input.hoaMonthly,
+    }).monthlyPayment;
+  }
+
+  private affordabilityComfort(
+    grossMonthly: number,
+    housing: number,
+    debts: number,
+  ): AffordabilityComfort {
+    if (grossMonthly <= 0) return 'stretch';
+    const front = housing / grossMonthly;
+    const back = (housing + debts) / grossMonthly;
+    if (front > FRONT_END_DTI || back > BACK_END_DTI) return 'over';
+    if (front <= COMFORT_FRONT_DTI && back <= COMFORT_BACK_DTI) return 'comfortable';
+    return 'stretch';
+  }
+
+  private affordabilityScore(
+    frontPct: number,
+    backPct: number,
+    comfort: AffordabilityComfort,
+  ): number {
+    if (comfort === 'comfortable') {
+      return Math.round(Math.min(100, 85 + (COMFORT_FRONT_DTI * 100 - frontPct)));
+    }
+    if (comfort === 'over') {
+      const overFront = Math.max(0, frontPct - FRONT_END_DTI * 100);
+      const overBack = Math.max(0, backPct - BACK_END_DTI * 100);
+      return Math.max(0, Math.round(45 - overFront - overBack * 0.5));
+    }
+    return Math.round(
+      Math.min(84, 70 + (FRONT_END_DTI * 100 - frontPct) * 0.5 + (BACK_END_DTI * 100 - backPct) * 0.3),
+    );
   }
 
   private principalAndInterest(
