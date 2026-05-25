@@ -19,9 +19,20 @@ const FRONT_END_DTI = 0.28;
 const BACK_END_DTI = 0.36;
 const COMFORT_FRONT_DTI = 0.25;
 const COMFORT_BACK_DTI = 0.33;
+/** Typical PMI as annual % of loan balance when down payment is under 20%. */
+const PMI_ANNUAL_RATE = 0.005;
+const PMI_DOWN_THRESHOLD_PERCENT = 20;
 
 @Injectable({ providedIn: 'root' })
 export class MortgageCalculatorService {
+  /** Monthly PMI from loan size; $0 when down payment is 20% or more. */
+  estimatePmiMonthly(loanAmount: number, downPaymentPercent: number): number {
+    if (loanAmount <= 0 || downPaymentPercent >= PMI_DOWN_THRESHOLD_PERCENT) {
+      return 0;
+    }
+    return (loanAmount * PMI_ANNUAL_RATE) / 12;
+  }
+
   calculateSimple(input: SimpleCalculatorInput): MortgageResult {
     const downAmount = input.homePrice * (input.downPaymentPercent / 100);
     const loanAmount = Math.max(0, input.homePrice - downAmount);
@@ -32,10 +43,7 @@ export class MortgageCalculatorService {
     );
     const propertyTaxMonthly = input.propertyTaxAnnual / 12;
     const insuranceMonthly = input.insuranceAnnual / 12;
-    const pmiMonthly =
-      input.downPaymentPercent < 20
-        ? input.pmiMonthly || loanAmount * 0.005 / 12
-        : input.pmiMonthly;
+    const pmiMonthly = this.estimatePmiMonthly(loanAmount, input.downPaymentPercent);
     const hoaMonthly = input.hoaMonthly;
 
     const parts: Omit<PaymentBreakdownItem, 'percent'>[] = [
@@ -238,10 +246,8 @@ export class MortgageCalculatorService {
   private monthlyHousingForPrice(homePrice: number, input: AffordabilityInput): number {
     const propertyTaxAnnual = homePrice * (input.propertyTaxRatePercent / 100);
     const insuranceAnnual = homePrice * (input.insuranceRatePercent / 100);
-    const pmiMonthly =
-      input.downPaymentPercent < 20
-        ? Math.max(0, homePrice * (1 - input.downPaymentPercent / 100) * 0.005 / 12)
-        : 0;
+    const loanAmount = Math.max(0, homePrice * (1 - input.downPaymentPercent / 100));
+    const pmiMonthly = this.estimatePmiMonthly(loanAmount, input.downPaymentPercent);
     return this.calculateSimple({
       homePrice,
       downPaymentPercent: input.downPaymentPercent,

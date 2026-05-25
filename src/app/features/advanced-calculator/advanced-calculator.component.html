@@ -50,10 +50,22 @@
         <input type="number" [ngModel]="input().insuranceAnnual" (ngModelChange)="onNumberChange('insuranceAnnual', $event)" name="insurance" min="0" />
       </label>
 
-      <label class="field">
-        <span>PMI (monthly)</span>
-        <input type="number" [ngModel]="input().pmiMonthly" (ngModelChange)="onNumberChange('pmiMonthly', $event)" name="pmi" min="0" />
-      </label>
+      <div class="field field--readonly">
+        <span>PMI (monthly, estimated)</span>
+        <input
+          type="text"
+          readonly
+          tabindex="-1"
+          [value]="result().mortgage.pmiMonthly | currency: 'USD' : 'symbol' : '1.2-2'"
+          name="pmi"
+          aria-readonly="true"
+        />
+        @if (result().mortgage.pmiMonthly > 0) {
+          <span class="field__hint">Auto-calculated at ~0.5% of loan per year (down payment under 20%).</span>
+        } @else {
+          <span class="field__hint">Not required with 20% or more down.</span>
+        }
+      </div>
 
       <label class="field">
         <span>HOA (monthly)</span>

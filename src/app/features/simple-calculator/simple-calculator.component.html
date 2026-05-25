@@ -94,16 +94,22 @@
         />
       </label>
 
-      <label class="field">
-        <span>PMI (monthly, optional)</span>
+      <div class="field field--readonly">
+        <span>PMI (monthly, estimated)</span>
         <input
-          type="number"
-          [ngModel]="input().pmiMonthly"
-          (ngModelChange)="onNumberChange('pmiMonthly', $event)"
+          type="text"
+          readonly
+          tabindex="-1"
+          [value]="result().pmiMonthly | currency: 'USD' : 'symbol' : '1.2-2'"
           name="pmi"
-          min="0"
+          aria-readonly="true"
         />
-      </label>
+        @if (result().pmiMonthly > 0) {
+          <span class="field__hint">Auto-calculated at ~0.5% of loan per year (down payment under 20%).</span>
+        } @else {
+          <span class="field__hint">Not required with 20% or more down.</span>
+        }
+      </div>
 
       <label class="field">
         <span>HOA (monthly, optional)</span>

@@ -54,6 +54,14 @@
   gap: 0.35rem;
   margin-bottom: 0.875rem;
 
+  &--readonly input[readonly] {
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    cursor: default;
+    font-variant-numeric: tabular-nums;
+  }
+
   .field__hint {
     font-size: 0.8rem;
     color: var(--color-muted);

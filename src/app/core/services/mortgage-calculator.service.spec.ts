@@ -42,6 +42,28 @@ describe('MortgageCalculatorService', () => {
     expect(result.monthlyPayment).toBeGreaterThan(result.principalAndInterest);
   });
 
+  it('auto-calculates PMI when down payment is under 20%', () => {
+    const result = service.calculateSimple({
+      ...DEFAULT_SIMPLE_INPUT,
+      homePrice: 400_000,
+      downPaymentPercent: 10,
+      pmiMonthly: 999,
+    });
+    expect(result.loanAmount).toBe(360_000);
+    expect(result.pmiMonthly).toBeCloseTo(150, 2);
+    expect(result.breakdown.some((b) => b.key === 'pmi')).toBe(true);
+  });
+
+  it('sets PMI to zero when down payment is 20% or more', () => {
+    const result = service.calculateSimple({
+      ...DEFAULT_SIMPLE_INPUT,
+      downPaymentPercent: 20,
+      pmiMonthly: 999,
+    });
+    expect(result.pmiMonthly).toBe(0);
+    expect(result.breakdown.some((b) => b.key === 'pmi')).toBe(false);
+  });
+
   it('returns zero P&I when loan amount is zero', () => {
     const result = service.calculateSimple({
       ...DEFAULT_SIMPLE_INPUT,
