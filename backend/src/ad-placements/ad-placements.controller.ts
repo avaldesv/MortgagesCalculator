@@ -30,8 +30,8 @@ export class AdPlacementsAdminController {
   constructor(private readonly placements: AdPlacementsService) {}
 
   @Get()
-  list() {
-    return { data: this.placements.listAll() };
+  async list() {
+    return { data: await this.placements.listAll() };
   }
 
   @Get(':placementId')
@@ -51,7 +51,7 @@ export class AdPlacementsAdminController {
 
   @Delete(':placementId')
   @HttpCode(204)
-  remove(@Param('placementId') id: string): void {
-    this.placements.remove(id);
+  async remove(@Param('placementId') id: string): Promise<void> {
+    await this.placements.remove(id);
   }
 }

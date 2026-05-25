@@ -17,8 +17,15 @@ import { ListingsAdConfigService } from '../../core/services/listings-ad-config.
         <button type="button" class="btn btn--secondary" (click)="logout()">Log out</button>
       </header>
 
+      @if (loadError()) {
+        <p class="admin-error card" role="alert">{{ loadError() }}</p>
+      }
+
       <div class="card">
         <h2>Ad placements</h2>
+        @if (placements().length === 0 && !loading()) {
+          <p class="admin-empty">No placements loaded. Check API connection or log in again.</p>
+        }
         @for (p of placements(); track p.id) {
           <div class="admin-row">
             <div>
@@ -35,6 +42,9 @@ import { ListingsAdConfigService } from '../../core/services/listings-ad-config.
 
       <div class="card">
         <h2>Sponsored listings</h2>
+        @if (listings().length === 0 && !loading()) {
+          <p class="admin-empty">No listings loaded.</p>
+        }
         @for (l of listings(); track l.id) {
           <div class="admin-row">
             <div>
@@ -81,6 +91,16 @@ import { ListingsAdConfigService } from '../../core/services/listings-ad-config.
       align-items: center;
       gap: 0.35rem;
     }
+    .admin-empty {
+      margin: 0;
+      color: var(--color-muted);
+      font-size: 0.9rem;
+    }
+    .admin-error {
+      color: #b91c1c;
+      border-color: #fecaca;
+      background: #fef2f2;
+    }
   `,
 })
 export class AdminDashboardComponent implements OnInit {
@@ -91,6 +111,8 @@ export class AdminDashboardComponent implements OnInit {
 
   readonly placements = signal<ListingsAdPlacement[]>([]);
   readonly listings = signal<SponsoredListing[]>([]);
+  readonly loading = signal(true);
+  readonly loadError = signal<string | null>(null);
 
   ngOnInit(): void {
     if (!this.auth.isLoggedIn()) {
@@ -101,8 +123,39 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   reload(): void {
-    this.api.listPlacements().subscribe((r) => this.placements.set(r.data));
-    this.api.listListings().subscribe((r) => this.listings.set(r.data));
+    this.loading.set(true);
+    this.loadError.set(null);
+    let placementsDone = false;
+    let listingsDone = false;
+    const done = () => {
+      if (placementsDone && listingsDone) this.loading.set(false);
+    };
+
+    this.api.listPlacements().subscribe({
+      next: (r) => {
+        this.placements.set(Array.isArray(r.data) ? r.data : []);
+        placementsDone = true;
+        done();
+      },
+      error: () => {
+        this.loadError.set('Could not load ad placements. Try logging out and in again.');
+        placementsDone = true;
+        done();
+      },
+    });
+
+    this.api.listListings().subscribe({
+      next: (r) => {
+        this.listings.set(Array.isArray(r.data) ? r.data : []);
+        listingsDone = true;
+        done();
+      },
+      error: () => {
+        this.loadError.set('Could not load listings. Try logging out and in again.');
+        listingsDone = true;
+        done();
+      },
+    });
   }
 
   togglePlacement(p: ListingsAdPlacement, e: Event): void {

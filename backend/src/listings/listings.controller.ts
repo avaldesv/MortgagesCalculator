@@ -49,7 +49,7 @@ export class ListingsAdminController {
   ) {
     return this.listings.listAdmin(
       page ? Number(page) : 1,
-      pageSize ? Number(pageSize) : 20,
+      pageSize ? Number(pageSize) : 50,
       active === undefined ? undefined : active === 'true',
     );
   }
@@ -66,7 +66,7 @@ export class ListingsAdminController {
 
   @Delete(':listingId')
   @HttpCode(204)
-  remove(@Param('listingId') id: string): void {
-    this.listings.remove(id);
+  async remove(@Param('listingId') id: string): Promise<void> {
+    await this.listings.remove(id);
   }
 }
