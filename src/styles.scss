@@ -95,4 +95,4 @@ a {
   border: 1px solid var(--color-border);
 }
 
-@use 'styles/layout-shell';
+@import './styles/layout-shell';
