@@ -1,6 +1,7 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
-import { join } from 'path';
+import { Injectable, OnModuleInit, Optional } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { JsonFileStorage } from './json-file.storage';
+import { PrismaStorage } from './prisma.storage';
 
 export type TabId =
   | 'simple-calculator'
@@ -65,89 +66,74 @@ export interface PartnerLead {
   createdAt: string;
 }
 
-interface StoreData {
-  placements: AdPlacement[];
-  listings: SponsoredListing[];
-  partnerLeads?: PartnerLead[];
-}
-
 @Injectable()
 export class DataStoreService implements OnModuleInit {
-  private data!: StoreData;
-  private readonly storePath = join(process.cwd(), 'data', 'store.json');
-  private readonly seedPath = join(process.cwd(), 'data', 'seed.json');
+  readonly persistenceMode: 'json' | 'prisma';
 
-  onModuleInit(): void {
-    const dir = join(process.cwd(), 'data');
-    if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
-    if (existsSync(this.storePath)) {
-      this.data = JSON.parse(readFileSync(this.storePath, 'utf8')) as StoreData;
+  private json?: JsonFileStorage;
+  private prismaStore?: PrismaStorage;
+
+  constructor(@Optional() private readonly prisma?: PrismaService) {
+    this.persistenceMode = process.env.DATABASE_URL ? 'prisma' : 'json';
+  }
+
+  async onModuleInit(): Promise<void> {
+    if (this.persistenceMode === 'prisma' && this.prisma) {
+      this.prismaStore = new PrismaStorage(this.prisma);
+      await this.prismaStore.init();
     } else {
-      this.data = JSON.parse(readFileSync(this.seedPath, 'utf8')) as StoreData;
-      this.persist();
-    }
-    if (!this.data.partnerLeads) {
-      this.data.partnerLeads = [];
-      this.persist();
+      this.json = new JsonFileStorage();
+      this.json.init();
     }
   }
 
-  private persist(): void {
-    writeFileSync(this.storePath, JSON.stringify(this.data, null, 2), 'utf8');
+  async getPlacements(): Promise<AdPlacement[]> {
+    if (this.prismaStore) return this.prismaStore.getPlacementsAsync();
+    return this.json!.getPlacements();
   }
 
-  getPlacements(): AdPlacement[] {
-    return [...this.data.placements];
+  async getPlacement(id: string): Promise<AdPlacement | undefined> {
+    if (this.prismaStore) return this.prismaStore.getPlacementAsync(id);
+    return this.json!.getPlacement(id);
   }
 
-  getPlacement(id: string): AdPlacement | undefined {
-    return this.data.placements.find((p) => p.id === id);
+  async upsertPlacement(placement: AdPlacement): Promise<void> {
+    if (this.prismaStore) return this.prismaStore.upsertPlacementAsync(placement);
+    this.json!.upsertPlacement(placement);
   }
 
-  upsertPlacement(placement: AdPlacement): void {
-    const idx = this.data.placements.findIndex((p) => p.id === placement.id);
-    if (idx >= 0) this.data.placements[idx] = placement;
-    else this.data.placements.push(placement);
-    this.persist();
+  async deletePlacement(id: string): Promise<boolean> {
+    if (this.prismaStore) return this.prismaStore.deletePlacementAsync(id);
+    return this.json!.deletePlacement(id);
   }
 
-  deletePlacement(id: string): boolean {
-    const before = this.data.placements.length;
-    this.data.placements = this.data.placements.filter((p) => p.id !== id);
-    if (this.data.placements.length === before) return false;
-    this.persist();
-    return true;
+  async getListings(): Promise<SponsoredListing[]> {
+    if (this.prismaStore) return this.prismaStore.getListingsAsync();
+    return this.json!.getListings();
   }
 
-  getListings(): SponsoredListing[] {
-    return [...this.data.listings];
+  async getListing(id: string): Promise<SponsoredListing | undefined> {
+    if (this.prismaStore) return this.prismaStore.getListingAsync(id);
+    return this.json!.getListing(id);
   }
 
-  getListing(id: string): SponsoredListing | undefined {
-    return this.data.listings.find((l) => l.id === id);
+  async upsertListing(listing: SponsoredListing): Promise<void> {
+    if (this.prismaStore) return this.prismaStore.upsertListingAsync(listing);
+    this.json!.upsertListing(listing);
   }
 
-  upsertListing(listing: SponsoredListing): void {
-    const idx = this.data.listings.findIndex((l) => l.id === listing.id);
-    if (idx >= 0) this.data.listings[idx] = listing;
-    else this.data.listings.push(listing);
-    this.persist();
+  async deleteListing(id: string): Promise<boolean> {
+    if (this.prismaStore) return this.prismaStore.deleteListingAsync(id);
+    return this.json!.deleteListing(id);
   }
 
-  deleteListing(id: string): boolean {
-    const before = this.data.listings.length;
-    this.data.listings = this.data.listings.filter((l) => l.id !== id);
-    if (this.data.listings.length === before) return false;
-    this.persist();
-    return true;
+  async addPartnerLead(lead: PartnerLead): Promise<void> {
+    if (this.prismaStore) return this.prismaStore.addPartnerLeadAsync(lead);
+    this.json!.addPartnerLead(lead);
   }
 
-  addPartnerLead(lead: PartnerLead): void {
-    this.data.partnerLeads!.push(lead);
-    this.persist();
-  }
-
-  getPartnerLeads(): PartnerLead[] {
-    return [...(this.data.partnerLeads ?? [])];
+  async getPartnerLeads(): Promise<PartnerLead[]> {
+    if (this.prismaStore) return this.prismaStore.getPartnerLeadsAsync();
+    return this.json!.getPartnerLeads();
   }
 }

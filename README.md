@@ -45,18 +45,27 @@ Output: `dist/mortgage-calculator/browser/`
 
 ## Deploy on Railway
 
+Guía paso a paso staging: [`docs/deploy/railway-staging.md`](docs/deploy/railway-staging.md).
+
 ### Web (Angular + nginx)
 
-1. Service root: repo root — uses root `Dockerfile` + `railway.toml`.
-2. Healthcheck path: `/`
+1. Service root: repo root — `Dockerfile` + `railway.toml`.
+2. Healthcheck: `/`
+3. Variable de build: `API_BASE_URL` = URL pública del servicio API (sin `/` final).
 
 ### API (NestJS)
 
-1. Add a second service with root directory **`backend/`** — uses `backend/Dockerfile` + `backend/railway.toml`.
-2. Healthcheck path: `/api/health`
-3. Set env: `JWT_SECRET`, `ADMIN_PASSWORD`, `CORS_ORIGIN` (web app URL).
+1. Segundo servicio, root **`backend/`** — `backend/Dockerfile` + `backend/railway.toml`.
+2. Healthcheck: `/api/health`
+3. Variables: ver `backend/.env.example` (`JWT_SECRET`, `ADMIN_PASSWORD`, `CORS_ORIGIN`, opcional `DATABASE_URL` + `PRISMA_MIGRATE_ON_START`).
 
-Point production `environment.ts` `apiBaseUrl` to the API Railway URL when wiring staging.
+**Persistencia:** sin `DATABASE_URL` → JSON local; con PostgreSQL Railway → Prisma (ver `docs/decisions/ADR-P0-A-persistence.md`).
+
+### Smoke test API desplegada
+
+```bash
+API_URL=https://your-api.up.railway.app node scripts/smoke-staging-api.mjs
+```
 
 ### Option B — Nixpacks (Node)
 

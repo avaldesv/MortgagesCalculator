@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AdPlacement {
+  id              String   @id
+  enabled         Boolean
+  position        String
+  tabs            Json
+  maxListings     Int?
+  sponsoredLabel  String?
+  priority        Int?
+  updatedAt       DateTime
+}
+
+model SponsoredListing {
+  id                      String  @id
+  price                   Float
+  city                    String
+  state                   String
+  estimatedMonthlyPayment Float
+  bedrooms                Int
+  bathrooms               Float
+  squareFeet              Int
+  agentOrCompany          String
+  listingUrl              String
+  zip                     String?
+  active                  Boolean @default(true)
+}
+
+model PartnerLead {
+  id             String   @id
+  name           String
+  company        String
+  email          String
+  phone          String
+  serviceType    String
+  targetRegion   String
+  monthlyBudget  Float?
+  message        String?
+  consentContact Boolean
+  createdAt      DateTime @default(now())
+}

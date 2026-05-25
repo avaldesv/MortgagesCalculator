@@ -21,18 +21,18 @@ const TAB_IDS: TabId[] = [
 export class AdPlacementsService {
   constructor(private readonly store: DataStoreService) {}
 
-  listAll(): AdPlacement[] {
+  async listAll(): Promise<AdPlacement[]> {
     return this.store.getPlacements();
   }
 
-  getOne(id: string): AdPlacement {
-    const p = this.store.getPlacement(id);
+  async getOne(id: string): Promise<AdPlacement> {
+    const p = await this.store.getPlacement(id);
     if (!p) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Placement not found.' });
     return p;
   }
 
-  create(input: Omit<AdPlacement, 'updatedAt'>): AdPlacement {
-    if (this.store.getPlacement(input.id)) {
+  async create(input: Omit<AdPlacement, 'updatedAt'>): Promise<AdPlacement> {
+    if (await this.store.getPlacement(input.id)) {
       throw new ConflictException({
         code: 'PLACEMENT_ID_CONFLICT',
         message: `Placement id "${input.id}" already exists.`,
@@ -42,35 +42,34 @@ export class AdPlacementsService {
       ...input,
       updatedAt: new Date().toISOString(),
     };
-    this.store.upsertPlacement(placement);
+    await this.store.upsertPlacement(placement);
     return placement;
   }
 
-  update(id: string, patch: Partial<Omit<AdPlacement, 'id' | 'updatedAt'>>): AdPlacement {
-    const existing = this.getOne(id);
+  async update(id: string, patch: Partial<Omit<AdPlacement, 'id' | 'updatedAt'>>): Promise<AdPlacement> {
+    const existing = await this.getOne(id);
     const placement: AdPlacement = {
       ...existing,
       ...patch,
       id,
       updatedAt: new Date().toISOString(),
     };
-    this.store.upsertPlacement(placement);
+    await this.store.upsertPlacement(placement);
     return placement;
   }
 
-  remove(id: string): void {
-    if (!this.store.deletePlacement(id)) {
+  async remove(id: string): Promise<void> {
+    if (!(await this.store.deletePlacement(id))) {
       throw new NotFoundException({ code: 'NOT_FOUND', message: 'Placement not found.' });
     }
   }
 
-  activeForTab(tabId: string): { tabId: TabId; placements: AdPlacement[] } {
+  async activeForTab(tabId: string): Promise<{ tabId: TabId; placements: AdPlacement[] }> {
     if (!TAB_IDS.includes(tabId as TabId)) {
       return { tabId: tabId as TabId, placements: [] };
     }
     const tab = tabId as TabId;
-    const active = this.store
-      .getPlacements()
+    const active = (await this.store.getPlacements())
       .filter((p) => p.enabled && this.appliesToTab(p.tabs, tab))
       .sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0));
 

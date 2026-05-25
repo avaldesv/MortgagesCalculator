@@ -100,8 +100,8 @@ Epic **P0-A**: fundación de producto + plataforma mínima (FE Angular, API Nest
 - [x] Simple Calculator L2+, compliance, branding
 - [x] API: health, JWT admin, placements, listings (JSON store)
 - [x] FE: placements dinámicos, admin, proxy local
-- [ ] **AVV-28**: Prisma + migraciones (o decisión documentada de mantener JSON)
-- [ ] **AVV-34**: Deploy staging verificado (web + API, healthchecks)
+- [x] **AVV-28**: Prisma híbrido + ADR (Done)
+- [ ] **AVV-34**: Deploy staging verificado en Railway (In Progress — guía lista)
 
 ## Entregado en repo (resumen)
 - Commits: \`06b8214\`, \`e8732b2\` (P0-A foundation + API)
@@ -196,30 +196,31 @@ Tests unitarios de \`MortgageCalculatorService\`.
 - Commit \`e8732b2\`, \`efcde3d\``,
   },
   'AVV-28': {
-    state: 'in_progress',
+    state: 'done',
     description: `## Objetivo
-Backend **NestJS** con persistencia acordada en plan (originalmente Prisma) y \`GET /api/health\`.
+Backend **NestJS** con persistencia híbrida y \`GET /api/health\`.
 
-## Qué hacer (criterios originales)
+## Qué hacer (criterios)
 - [x] Scaffold NestJS en \`backend/\`
-- [x] \`GET /api/health\` según OpenAPI
+- [x] \`GET /api/health\` (+ campo \`persistence\`)
 - [x] Módulos auth, placements, listings, partner leads
-- [ ] **Prisma** + schema + migraciones (o ADR explícito manteniendo JSON)
-- [ ] Seed vía DB si se migra a Prisma
+- [x] **Prisma** schema + migración inicial PostgreSQL
+- [x] Fallback **JSON** sin \`DATABASE_URL\` (dev local)
+- [x] Seed automático desde \`data/seed.json\` cuando DB vacía
+- [x] ADR decisión híbrida
 
-## Entregado (estado actual)
-- Persistencia **JSON**: \`backend/data/seed.json\`, \`backend/data/store.json\`
-- \`DataStoreService\` read/write en disco
-- Dockerfile + \`railway.toml\` para API
-- **Sin** \`prisma/schema.prisma\`
+## Entregado en repo
+- \`backend/prisma/schema.prisma\` + \`migrations/20260524120000_init\`
+- \`JsonFileStorage\` + \`PrismaStorage\` vía \`DataStoreService\`
+- \`docs/decisions/ADR-P0-A-persistence.md\`
+- \`backend/.env.example\` (\`DATABASE_URL\`, \`PRISMA_MIGRATE_ON_START\`)
 
-## Pendiente (siguiente trabajo)
-1. Decidir: migrar a Prisma PostgreSQL o documentar JSON como decisión P0
-2. Si Prisma: schema, migrate, adaptar services
-3. Variables Railway: \`DATABASE_URL\`, JWT secret producción
+## Pendiente (operaciones, no código P0)
+- Probar Prisma en Railway con plugin Postgres (ver AVV-34)
+- Rotar \`JWT_SECRET\` / \`ADMIN_PASSWORD\` en staging
 
 ## Referencias
-- ${REPO}/tree/${MAIN}/backend`,
+- ${REPO}/tree/${MAIN}/backend/prisma`,
   },
   'AVV-29': {
     state: 'done',
@@ -319,31 +320,33 @@ FE consume **API de placements** (no config estático en prod).
 - GATE-0 branding doc`,
   },
   'AVV-34': {
-    state: 'backlog',
+    state: 'in_progress',
     description: `## Objetivo
-**Railway staging**: servicio Web (Angular) + servicio API (NestJS) con healthchecks verificados.
+**Railway staging**: Web + API (+ Postgres opcional) desplegados y verificados con smoke tests.
 
 ## Qué hacer
-- [x] Dockerfile API + \`railway.toml\` en repo
-- [x] README con instrucciones 2 servicios
-- [ ] Crear/verificar servicio API en Railway staging
-- [ ] URL API en \`environment.staging\` / OpenAPI \`servers[0].url\`
-- [ ] Healthcheck \`GET /api/health\` OK desde Railway
-- [ ] FE staging apunta a API staging (CORS si aplica)
-- [ ] Smoke: placements + listings + partner lead
+- [x] Dockerfile API + Web + \`railway.toml\`
+- [x] Guía \`docs/deploy/railway-staging.md\` (checklist completo)
+- [x] Build FE con \`API_BASE_URL\` (\`scripts/generate-environment.mjs\`)
+- [x] Config Angular \`staging\` + \`environment.staging.ts\`
+- [x] Script \`scripts/smoke-staging-api.mjs\`
+- [ ] Crear servicios en Railway (web + api + postgres)
+- [ ] Variables env configuradas (ver guía)
+- [ ] \`node scripts/smoke-staging-api.mjs\` OK contra URL pública
+- [ ] Actualizar OpenAPI \`servers[0].url\` con URL real
+- [ ] Verificación manual FE (admin, listings, partners)
 
 ## Entregado en repo
-- Config Docker backend; nginx FE ya soporta PORT Railway
-- **No verificado** deploy end-to-end en staging
+- Todo lo anterior está en \`${MAIN}\`; falta ejecución en cuenta Railway
 
-## Pendiente (próximo sprint)
-1. Deploy API staging + variables env
-2. Probar admin login y listings desde URL pública staging
-3. Documentar URLs en README y OpenAPI
+## Pendiente (acción manual)
+1. Deploy según guía → copiar URLs
+2. Redeploy web con \`API_BASE_URL\` correcto
+3. Smoke + checklist → marcar este issue **Done**
 
 ## Referencias
-- ${REPO}/blob/${MAIN}/backend/Dockerfile
-- Issue bloquea cierre epic AVV-23`,
+- ${REPO}/blob/${MAIN}/docs/deploy/railway-staging.md
+- Bloquea cierre epic AVV-23`,
   },
   'AVV-35': {
     state: 'done',

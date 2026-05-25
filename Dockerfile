@@ -4,6 +4,9 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
+ARG API_BASE_URL=
+ENV API_BASE_URL=$API_BASE_URL
+RUN node scripts/generate-environment.mjs production
 RUN npm run build
 
 # Production stage — Railway injects $PORT; nginx template listens on it

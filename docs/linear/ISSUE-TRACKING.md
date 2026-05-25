@@ -26,9 +26,9 @@ node scripts/linear-reconcile-states.mjs
 
 | Estado | Issues |
 |--------|--------|
-| **Done** | AVV-20–22, AVV-24–27, AVV-29–33, AVV-35–45 |
-| **In Progress** | AVV-23 (epic P0-A), AVV-28 (Prisma/JSON) |
-| **Backlog** | AVV-34 (Railway staging) |
+| **Done** | AVV-20–22, AVV-24–29, AVV-30–33, AVV-35–45 |
+| **In Progress** | AVV-23 (epic P0-A), AVV-34 (Railway staging — guía lista, falta deploy) |
+| **Backlog** | — |
 
 ## Mapa rápido
 
@@ -42,13 +42,13 @@ node scripts/linear-reconcile-states.mjs
 | AVV-25 | Unit tests | 13+ tests | — |
 | AVV-26 | Compliance | doc + UI | legal review P1 |
 | AVV-27 | Simple L2+ | tab completa | — |
-| AVV-28 | NestJS + Prisma | API JSON + health | Prisma o ADR |
+| AVV-28 | NestJS + Prisma | Prisma híbrido + ADR | probar en Railway |
 | AVV-29 | Auth JWT | login + guard | rotar creds prod |
 | AVV-30 | API placements/listings | CRUD + público | — |
 | AVV-31 | FE placements | HTTP service | — |
 | AVV-32 | Admin UI | dashboard | — |
 | AVV-33 | Branding UI | header/footer | logo P1 |
-| AVV-34 | Railway staging | Docker/config | deploy verificado |
+| AVV-34 | Railway staging | guía + smoke script | deploy en Railway |
 | AVV-35–38 | CalculatorState | epic + 3 subs | — |
 | AVV-39 | Advanced | amortización + charts | export P1 |
 | AVV-40 | Affordability | DTI + score | — |

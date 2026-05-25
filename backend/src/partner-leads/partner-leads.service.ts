@@ -34,7 +34,10 @@ export class PartnerLeadsService {
 
   constructor(private readonly store: DataStoreService) {}
 
-  create(dto: CreatePartnerLeadDto, clientIp: string): { id: string; status: 'received'; createdAt: string } {
+  async create(
+    dto: CreatePartnerLeadDto,
+    clientIp: string,
+  ): Promise<{ id: string; status: 'received'; createdAt: string }> {
     this.enforceRateLimit(clientIp);
     this.validate(dto);
 
@@ -43,7 +46,7 @@ export class PartnerLeadsService {
       ...dto,
       createdAt: new Date().toISOString(),
     };
-    this.store.addPartnerLead(lead);
+    await this.store.addPartnerLead(lead);
     return { id: lead.id, status: 'received', createdAt: lead.createdAt };
   }
 
