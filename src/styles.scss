@@ -19,6 +19,9 @@
   --shadow-card: 0 4px 24px rgba(15, 23, 42, 0.06);
   --layout-max: 1400px;
   --layout-gutter: 1.25rem;
+  /* Main + right rail (no empty left ad column) */
+  --layout-cols: minmax(0, 1fr) minmax(200px, 260px);
+  --layout-cols-with-left: minmax(180px, 220px) minmax(0, 1fr) minmax(200px, 260px);
 }
 
 *,
@@ -91,3 +94,5 @@ a {
   color: var(--color-text);
   border: 1px solid var(--color-border);
 }
+
+@use 'styles/layout-shell';

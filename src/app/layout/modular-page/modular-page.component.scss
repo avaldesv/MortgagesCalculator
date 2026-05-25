@@ -1,15 +1,28 @@
 .modular-page__grid {
   display: grid;
   gap: 1rem;
-  grid-template-columns: minmax(180px, 220px) minmax(0, 1fr) minmax(200px, 260px);
+  grid-template-columns: var(--layout-cols);
+  grid-template-areas:
+    'ad-tc ad-tr'
+    'content ad-mr'
+    'ad-bc ad-br'
+    'footer footer';
+  max-width: var(--layout-max);
+  margin: 0 auto;
+  padding: 1rem var(--layout-gutter) 2rem;
+}
+
+.modular-page__grid:has(
+  [data-ad-position='top-left']:not(.modular-page__ad-slot--empty),
+  [data-ad-position='middle-left']:not(.modular-page__ad-slot--empty),
+  [data-ad-position='bottom-left']:not(.modular-page__ad-slot--empty)
+) {
+  grid-template-columns: var(--layout-cols-with-left);
   grid-template-areas:
     'ad-tl ad-tc ad-tr'
     'ad-ml content ad-mr'
     'ad-bl ad-bc ad-br'
     'footer footer footer';
-  max-width: var(--layout-max);
-  margin: 0 auto;
-  padding: 1rem var(--layout-gutter) 2rem;
 }
 
 .modular-page__content {
