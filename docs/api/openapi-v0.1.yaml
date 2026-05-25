@@ -35,8 +35,8 @@ info:
     url: https://github.com/avaldesv/MortgagesCalculator
 
 servers:
-  - url: https://api.example.railway.app
-    description: Production — replace with Railway API service URL
+  - url: https://backend-production-dbaf7.up.railway.app
+    description: Production API (Railway)
   - url: http://localhost:3000
     description: Local NestJS development
 

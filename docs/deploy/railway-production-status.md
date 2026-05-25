@@ -1,53 +1,29 @@
 # Railway production — estado verificado
 
-| Campo | Valor |
-|-------|--------|
-| Web (FE) | https://mortgagescalculator-production.up.railway.app |
-| Verificado | 2026-05-25 |
-| API pública | **Pendiente** (no hay servicio API en esta URL) |
+| Servicio | URL | Estado |
+|----------|-----|--------|
+| **Web (FE)** | https://mortgagescalculator-production.up.railway.app | OK — Angular |
+| **API (NestJS)** | https://backend-production-dbaf7.up.railway.app | OK — JSON `/api/health` |
+| Última verificación | 2026-05-25 | Smoke test passed |
 
-## Qué funciona hoy
+## API verificado
 
-- App Angular carga correctamente (Simple Calculator, navegación SPA).
-- Cálculos en el cliente (no requieren backend).
-
-## Qué no funciona en esta URL
-
-Las rutas `/api/*` las sirve **nginx** con `index.html` (fallback SPA), no NestJS:
-
-```text
-GET /api/health          → HTML (esperado: JSON)
-GET /api/v1/listings     → HTML
-POST /api/v1/leads/partner → HTML
+```json
+GET https://backend-production-dbaf7.up.railway.app/api/health
+{ "status": "ok", "version": "0.1.0", "persistence": "json", ... }
 ```
 
-**Causa:** solo está desplegado el servicio **Web** (root `Dockerfile`). Falta el segundo servicio **API** (`backend/`) o un proxy nginx hacia él.
+Smoke (`node scripts/smoke-staging-api.mjs`): health, listings (3), partner lead 201.
 
-Además, el build actual tiene `apiBaseUrl: ''`, así que el FE llama a `/api/...` en el mismo host (web).
+## Pendiente para cerrar AVV-34
 
-## Cómo completar AVV-34
+El **Web** aún llama a `/api/*` en su propio dominio (devuelve HTML). Falta:
 
-### Opción A — Dos servicios (recomendada)
-
-1. En Railway, añadir servicio con **Root Directory** = `backend`.
-2. Healthcheck: `/api/health` → debe responder JSON `{ status: "ok", persistence: "json"|"prisma", ... }`.
-3. Variables API: ver `backend/.env.example` (`JWT_SECRET`, `CORS_ORIGIN=https://mortgagescalculator-production.up.railway.app`, opcional Postgres).
-4. Copiar URL pública del servicio API (ej. `https://mortgagecalc-api-production.up.railway.app`).
-5. En el servicio **Web**, variable de build `API_BASE_URL` = URL del API (sin `/` final) → **Redeploy**.
-6. Smoke:
-
-   ```powershell
-   $env:API_URL = "https://TU-API.up.railway.app"
-   node scripts/smoke-staging-api.mjs
-   ```
-
-7. Actualizar `docs/api/openapi-v0.1.yaml` → `servers[0].url`.
-
-### Opción B — Proxy nginx en un solo servicio
-
-Requiere que el API corra en otra URL interna/pública y configurar `proxy_pass` en nginx (no implementado en repo hoy).
+1. **API** → variable `CORS_ORIGIN=https://mortgagescalculator-production.up.railway.app`
+2. **Web** → variable de build `API_BASE_URL=https://backend-production-dbaf7.up.railway.app` → **Redeploy**
+3. Probar en el navegador: Homes by Payment, Admin, Partners.
 
 ## Linear
 
-- **AVV-34** sigue **In Progress** hasta smoke API OK + FE con `API_BASE_URL` correcto.
-- **AVV-23** (epic) se cierra cuando AVV-34 esté Done.
+- **AVV-34** → Done cuando el paso anterior esté verificado.
+- **AVV-23** (epic P0-A) → Done con AVV-34.

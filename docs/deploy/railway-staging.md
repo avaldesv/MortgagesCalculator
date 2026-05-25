@@ -2,7 +2,7 @@
 
 Checklist para **Web** (Angular) + **API** (NestJS) + **PostgreSQL** opcional.
 
-**Producción web verificada:** https://mortgagescalculator-production.up.railway.app — FE OK; API aún no en ese host (ver [`railway-production-status.md`](./railway-production-status.md)).
+**Producción:** Web https://mortgagescalculator-production.up.railway.app · API https://backend-production-dbaf7.up.railway.app (ver [`railway-production-status.md`](./railway-production-status.md)).
 
 ## 1. Servicios en Railway
 
