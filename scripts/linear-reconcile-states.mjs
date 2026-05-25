@@ -43,6 +43,13 @@ const TARGET = {
   'AVV-36': 'done',
   'AVV-37': 'done',
   'AVV-38': 'done',
+  'AVV-39': 'done',
+  'AVV-40': 'done',
+  'AVV-41': 'done',
+  'AVV-42': 'done',
+  'AVV-43': 'done',
+  'AVV-44': 'done',
+  'AVV-45': 'done',
 };
 
 async function gql(query, variables = {}) {
@@ -73,7 +80,9 @@ async function main() {
   const states = data.workflowStates.nodes.filter((s) => s.team?.id === teamId);
   const byType = {
     done: states.find((s) => s.type === 'completed')?.id,
-    in_progress: states.find((s) => s.type === 'started' || s.name === 'In Progress')?.id,
+    in_progress:
+      states.find((s) => s.name === 'In Progress')?.id ??
+      states.find((s) => s.type === 'started')?.id,
     backlog: states.find((s) => s.type === 'unstarted' || s.name === 'Backlog')?.id,
   };
 

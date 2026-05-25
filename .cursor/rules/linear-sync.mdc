@@ -20,7 +20,8 @@ node scripts/linear-update-issues.mjs --in-progress AVV-XX
 
 3. **Never** run `linear-update-issues.mjs` without `--done` / `--in-progress` / `--backlog` args.
 4. Reconcile truth: `node scripts/linear-reconcile-states.mjs` after bulk mistakes.
-5. Document IDs in `docs/linear/BOOTSTRAP-RESULT.md`.
+5. After meaningful delivery: `node scripts/linear-sync-descriptions.mjs` (updates **description** with qué hacer / entregado / pendiente + state).
+6. Document IDs in `docs/linear/BOOTSTRAP-RESULT.md` and `docs/linear/ISSUE-TRACKING.md`.
 
 **Done** = criterios de aceptación cumplidos en `main`, no “casi hecho”.
 **In Progress** = trabajo activo ahora.

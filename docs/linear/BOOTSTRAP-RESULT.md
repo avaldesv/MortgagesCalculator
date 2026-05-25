@@ -41,16 +41,22 @@ AVV-20 … AVV-34 — gates + epic P0-A + 11 entregables.
 | Railway staging | AVV-34 | **Backlog** (sin deploy API staging) |
 | Resto P0-A-01…27, 29–33 | AVV-24–33 | Done |
 
-### P0-B — tabs (Backlog, sin código aún)
+### P0-B — tabs (Done en código + Linear 2026-05-24)
 
-| Tab | ID |
-|-----|-----|
-| Advanced L2 | AVV-39 |
-| Affordability L2 | AVV-40 |
-| Compare L2 | AVV-41 |
-| Homes f1 | AVV-42 |
-| Homes f2 | AVV-43 |
-| Learning L2 | AVV-44 |
-| Partners L3 | AVV-45 |
+| Tab | ID | Commit ref |
+|-----|-----|------------|
+| Advanced L2 | AVV-39 | `63bea0d` |
+| Affordability L2 | AVV-40 | `63bea0d` |
+| Compare L2 | AVV-41 | `f08b2a0` |
+| Homes f1 | AVV-42 | `b08bb13` |
+| Homes f2 | AVV-43 | `b08bb13` |
+| Learning L2 | AVV-44 | `e305373` |
+| Partners L3 | AVV-45 | `e305373` |
 
-Scripts: `node scripts/linear-reconcile-states.mjs` · `linear-update-issues.mjs --done|--in-progress|--backlog`
+### Seguimiento detallado
+
+- Descripciones en Linear: secciones **Objetivo**, **Qué hacer**, **Entregado**, **Pendiente**, **Referencias**
+- Regenerar: `node scripts/linear-sync-descriptions.mjs`
+- Resumen local: [`ISSUE-TRACKING.md`](./ISSUE-TRACKING.md)
+
+Scripts: `linear-sync-descriptions.mjs` · `linear-reconcile-states.mjs` · `linear-update-issues.mjs --done|--in-progress|--backlog`

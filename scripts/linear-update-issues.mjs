@@ -46,7 +46,8 @@ async function getTeamAndStates() {
   const team = data.teams.nodes[0];
   const states = data.workflowStates.nodes.filter((s) => s.team?.id === team.id);
   const done = states.find((s) => s.type === 'completed');
-  const started = states.find((s) => s.type === 'started' || s.name === 'In Progress');
+  const started =
+    states.find((s) => s.name === 'In Progress') ?? states.find((s) => s.type === 'started');
   const backlog = states.find((s) => s.type === 'unstarted' || s.name === 'Backlog');
   return { teamId: team.id, doneId: done?.id, startedId: started?.id, backlogId: backlog?.id };
 }
