@@ -90,7 +90,7 @@ Aprobar matriz **Definition of Done L1–L4** para gates y entregables P0.
 - Plan Linear proyecto MortgageCalc`,
   },
   'AVV-23': {
-    state: 'in_progress',
+    state: 'done',
     description: `## Objetivo
 Epic **P0-A**: fundación de producto + plataforma mínima (FE Angular, API NestJS, admin, CI, compliance).
 
@@ -98,21 +98,18 @@ Epic **P0-A**: fundación de producto + plataforma mínima (FE Angular, API Nest
 - [x] Gates GATE-0, GATE-1, GATE-2 Done
 - [x] CI verde: build FE, tests, lint OpenAPI, build API
 - [x] Simple Calculator L2+, compliance, branding
-- [x] API: health, JWT admin, placements, listings (JSON store)
-- [x] FE: placements dinámicos, admin, proxy local
-- [x] **AVV-28**: Prisma híbrido + ADR (Done)
-- [ ] **AVV-34**: Deploy staging verificado en Railway (In Progress — guía lista)
+- [x] API: health, JWT admin, placements, listings, partner leads
+- [x] FE: placements dinámicos, admin
+- [x] AVV-28 Done — Prisma híbrido + ADR + JSON en prod
+- [x] AVV-34 Done — Railway prod verificado
 
-## Entregado en repo (resumen)
-- Commits: \`06b8214\`, \`e8732b2\` (P0-A foundation + API)
-- \`backend/\`, \`.github/workflows/ci.yml\`, \`docs/compliance.md\`
+## Entregado
+- Web: https://mortgagescalculator-production.up.railway.app
+- API: https://backend-production-dbaf7.up.railway.app
+- Verificación: \`node scripts/verify-requirements.mjs\` → 42/42 (2026-05-25)
 
-## Pendiente (bloquea cerrar epic)
-1. AVV-28 — persistencia Prisma vs JSON actual
-2. AVV-34 — Railway staging API con URL en OpenAPI
-
-## Cierre del epic
-Mover a **Done** solo cuando AVV-28 y AVV-34 estén Done o descoped con ADR.
+## Pendiente
+- Ninguno para cierre P0-A epic
 
 ## Referencias
 - ${REPO}/blob/${MAIN}/docs/linear/P0-A-issues.md`,
@@ -320,33 +317,30 @@ FE consume **API de placements** (no config estático en prod).
 - GATE-0 branding doc`,
   },
   'AVV-34': {
-    state: 'in_progress',
+    state: 'done',
     description: `## Objetivo
-**Railway staging**: Web + API (+ Postgres opcional) desplegados y verificados con smoke tests.
+**Railway production**: Web + API desplegados, proxy nginx, smoke y admin verificados.
 
 ## Qué hacer
-- [x] Dockerfile API + Web + \`railway.toml\`
-- [x] Guía \`docs/deploy/railway-staging.md\` (checklist completo)
-- [x] Build FE con \`API_BASE_URL\` (\`scripts/generate-environment.mjs\`)
-- [x] Config Angular \`staging\` + \`environment.staging.ts\`
-- [x] Script \`scripts/smoke-staging-api.mjs\`
-- [ ] Crear servicios en Railway (web + api + postgres)
-- [ ] Variables env configuradas (ver guía)
-- [ ] \`node scripts/smoke-staging-api.mjs\` OK contra URL pública
-- [ ] Actualizar OpenAPI \`servers[0].url\` con URL real
-- [ ] Verificación manual FE (admin, listings, partners)
+- [x] Servicios Railway Web + API (\`backend/\` root)
+- [x] Healthchecks: \`/\` y \`/api/health\`
+- [x] OpenAPI \`servers[0].url\` → backend-production-dbaf7
+- [x] Proxy nginx \`/api/\` en Web
+- [x] \`scripts/smoke-staging-api.mjs\` OK
+- [x] \`scripts/verify-requirements.mjs\` 42/42
+- [x] Admin, listings, partners, CORS verificados
 
-## Entregado en repo
-- Todo lo anterior está en \`${MAIN}\`; falta ejecución en cuenta Railway
+## Entregado
+- Web: https://mortgagescalculator-production.up.railway.app
+- API: https://backend-production-dbaf7.up.railway.app
+- Docs: \`docs/deploy/railway-production-status.md\`
 
-## Pendiente (acción manual)
-1. Deploy según guía → copiar URLs
-2. Redeploy web con \`API_BASE_URL\` correcto
-3. Smoke + checklist → marcar este issue **Done**
+## Pendiente (ops P1)
+- Rotar \`ADMIN_PASSWORD\` / \`JWT_SECRET\` en prod
+- Postgres opcional (\`DATABASE_URL\`)
 
 ## Referencias
-- ${REPO}/blob/${MAIN}/docs/deploy/railway-staging.md
-- Bloquea cierre epic AVV-23`,
+- ${REPO}/blob/${MAIN}/docs/deploy/railway-production-status.md`,
   },
   'AVV-35': {
     state: 'done',

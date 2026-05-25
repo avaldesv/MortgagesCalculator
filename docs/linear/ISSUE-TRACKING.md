@@ -26,8 +26,8 @@ node scripts/linear-reconcile-states.mjs
 
 | Estado | Issues |
 |--------|--------|
-| **Done** | AVV-20–22, AVV-24–29, AVV-30–33, AVV-35–45 |
-| **In Progress** | AVV-23 (epic P0-A), AVV-34 (Railway staging — guía lista, falta deploy) |
+| **Done** | AVV-20–45 (GATE + P0-A + P0-B + CalculatorState) |
+| **In Progress** | — |
 | **Backlog** | — |
 
 ## Mapa rápido
@@ -37,7 +37,7 @@ node scripts/linear-reconcile-states.mjs
 | AVV-20 | GATE-0 branding | Doc decisión | — |
 | AVV-21 | GATE-1 OpenAPI | Spec + lint CI | URL prod en servers |
 | AVV-22 | GATE-2 DoD | Matriz aprobada | — |
-| AVV-23 | Epic P0-A | CI, API, admin, FE | AVV-28, AVV-34 |
+| AVV-23 | Epic P0-A | CI, API, admin, FE, prod 42/42 | — |
 | AVV-24 | CI | workflow GH | — |
 | AVV-25 | Unit tests | 13+ tests | — |
 | AVV-26 | Compliance | doc + UI | legal review P1 |
@@ -48,7 +48,7 @@ node scripts/linear-reconcile-states.mjs
 | AVV-31 | FE placements | HTTP service | — |
 | AVV-32 | Admin UI | dashboard | — |
 | AVV-33 | Branding UI | header/footer | logo P1 |
-| AVV-34 | Railway staging | guía + smoke script | deploy en Railway |
+| AVV-34 | Railway prod | web + API + proxy verificados | rotar creds P1 |
 | AVV-35–38 | CalculatorState | epic + 3 subs | — |
 | AVV-39 | Advanced | amortización + charts | export P1 |
 | AVV-40 | Affordability | DTI + score | — |

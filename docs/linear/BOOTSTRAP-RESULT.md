@@ -32,14 +32,12 @@ AVV-20 … AVV-34 — gates + epic P0-A + 11 entregables.
 | Epic prereq | AVV-35 | Done |
 | ST-01 … ST-03 | AVV-36–38 | Done |
 
-### P0-A — estados corregidos (no todo Done)
+### P0-A — Done (2026-05-25)
 
-| Issue | ID | Estado Linear |
-|-------|-----|---------------|
-| Epic P0-A | AVV-23 | **In Progress** (faltan ítems) |
-| NestJS + Prisma | AVV-28 | **In Progress** (API sí; Prisma no) |
-| Railway staging | AVV-34 | **Backlog** (sin deploy API staging) |
-| Resto P0-A-01…27, 29–33 | AVV-24–33 | Done |
+| Issue | ID | Estado |
+|-------|-----|--------|
+| Epic P0-A | AVV-23 | **Done** |
+| P0-A-01…11 | AVV-24–34 | **Done** |
 
 ### P0-B — tabs (Done en código + Linear 2026-05-24)
 
