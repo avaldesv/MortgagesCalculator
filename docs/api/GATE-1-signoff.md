@@ -25,7 +25,7 @@
 ## Cierre
 
 - [x] PR mergeado a `main` (rama `docs/gates-0-1`)
-- [ ] `servers[0].url` actualizado al URL Railway API real (pendiente P0-A-11 staging)
+- [x] `servers[0].url` → `https://backend-production-dbaf7.up.railway.app`
 - [ ] Issue Linear `[GATE-1]` → Done (AVV-21)
 
 **Gate cerrado cuando las tres filas de Cierre están marcadas.**

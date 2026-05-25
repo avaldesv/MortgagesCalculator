@@ -4,7 +4,7 @@
 |----------|-----|--------|
 | **Web (FE)** | https://mortgagescalculator-production.up.railway.app | OK — Angular |
 | **API (NestJS)** | https://backend-production-dbaf7.up.railway.app | OK — JSON `/api/health` |
-| Última verificación | 2026-05-25 | Smoke test passed |
+| Última verificación | 2026-05-25 | `verify-requirements.mjs` 42/42 OK |
 
 ## API verificado
 
@@ -15,21 +15,21 @@ GET https://backend-production-dbaf7.up.railway.app/api/health
 
 Smoke (`node scripts/smoke-staging-api.mjs`): health, listings (3), partner lead 201.
 
-## Conectar Web ↔ API (redeploy Web)
+## Web ↔ API (verificado)
 
-Diagnóstico: el bundle tenía `apiBaseUrl` vacío y nginx no hacía proxy → `/api/*` devolvía HTML.
+- `https://mortgagescalculator-production.up.railway.app/api/health` → JSON vía proxy nginx
+- Listings, login admin JWT, partner lead 201 vía proxy
+- Admin UI accesible en `/admin`
 
-**Solución en repo:** nginx hace proxy de `/api/` al backend; `API_BASE_URL` con valor por defecto en build.
+## Verificación automatizada
 
-1. **Redeploy solo el servicio Web** (commit con fix nginx).
-2. Variables opcionales en el servicio Web (runtime):
-   - `API_UPSTREAM_URL` = `https://backend-production-dbaf7.up.railway.app`
-   - `API_UPSTREAM_HOST` = `backend-production-dbaf7.up.railway.app`
-3. Build (opcional): `API_BASE_URL` marcada como **Available at Build Time** en Railway.
-4. Verificar: `https://mortgagescalculator-production.up.railway.app/api/health` → JSON (no HTML).
-5. Homes by Payment / Admin / Partners en el navegador.
+```powershell
+node scripts/verify-requirements.mjs
+```
 
-## Linear
+Última ejecución: **42/42** passed.
 
-- **AVV-34** → Done cuando el paso anterior esté verificado.
-- **AVV-23** (epic P0-A) → Done con AVV-34.
+## Linear (listo para cerrar)
+
+- **AVV-34** → Done
+- **AVV-23** (epic P0-A) → Done
