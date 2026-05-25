@@ -2,7 +2,6 @@
 FROM node:22-alpine
 WORKDIR /app
 
-ENV NODE_ENV=production
 ENV PORT=3000
 ENV NODE_OPTIONS=--max-old-space-size=460
 ENV npm_config_jobs=1
@@ -17,6 +16,8 @@ COPY tsconfig.json nest-cli.json ./
 COPY src ./src
 
 RUN npm run build && npm prune --omit=dev --ignore-scripts
+
+ENV NODE_ENV=production
 
 COPY data ./data
 
