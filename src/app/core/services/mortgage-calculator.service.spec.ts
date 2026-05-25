@@ -42,7 +42,18 @@ describe('MortgageCalculatorService', () => {
     expect(result.monthlyPayment).toBeGreaterThan(result.principalAndInterest);
   });
 
-  it('auto-calculates PMI when down payment is under 20%', () => {
+  it('estimatePmiMonthly matches loan * 0.5% annual / 12 when down < 20%', () => {
+    expect(service.estimatePmiMonthly(360_000, 10)).toBeCloseTo(150, 6);
+    expect(service.estimatePmiMonthly(382_500, 10)).toBeCloseTo(159.375, 6);
+  });
+
+  it('estimatePmiMonthly is zero at 20% down or above', () => {
+    expect(service.estimatePmiMonthly(340_000, 20)).toBe(0);
+    expect(service.estimatePmiMonthly(340_000, 25)).toBe(0);
+    expect(service.estimatePmiMonthly(0, 5)).toBe(0);
+  });
+
+  it('auto-calculates PMI when down payment is under 20% and ignores manual input', () => {
     const result = service.calculateSimple({
       ...DEFAULT_SIMPLE_INPUT,
       homePrice: 400_000,
@@ -51,7 +62,31 @@ describe('MortgageCalculatorService', () => {
     });
     expect(result.loanAmount).toBe(360_000);
     expect(result.pmiMonthly).toBeCloseTo(150, 2);
-    expect(result.breakdown.some((b) => b.key === 'pmi')).toBe(true);
+    expect(result.breakdown.find((b) => b.key === 'pmi')?.monthly).toBeCloseTo(150, 2);
+    const withoutPmi =
+      result.monthlyPayment -
+      result.principalAndInterest -
+      result.propertyTaxMonthly -
+      result.insuranceMonthly -
+      result.hoaMonthly;
+    expect(withoutPmi).toBeCloseTo(150, 2);
+  });
+
+  it('default simple input (20% down) shows zero PMI', () => {
+    const result = service.calculateSimple(DEFAULT_SIMPLE_INPUT);
+    expect(result.loanAmount).toBe(340_000);
+    expect(result.pmiMonthly).toBe(0);
+    expect(result.breakdown.some((b) => b.key === 'pmi')).toBe(false);
+  });
+
+  it('425k home with 10% down yields ~$159.38/mo PMI', () => {
+    const result = service.calculateSimple({
+      ...DEFAULT_SIMPLE_INPUT,
+      homePrice: 425_000,
+      downPaymentPercent: 10,
+    });
+    expect(result.loanAmount).toBe(382_500);
+    expect(result.pmiMonthly).toBeCloseTo(159.38, 2);
   });
 
   it('sets PMI to zero when down payment is 20% or more', () => {
@@ -62,6 +97,19 @@ describe('MortgageCalculatorService', () => {
     });
     expect(result.pmiMonthly).toBe(0);
     expect(result.breakdown.some((b) => b.key === 'pmi')).toBe(false);
+  });
+
+  it('advanced calculator uses the same auto PMI as simple', () => {
+    const input = {
+      ...DEFAULT_SIMPLE_INPUT,
+      homePrice: 425_000,
+      downPaymentPercent: 10,
+      extraMonthlyPayment: 100,
+    };
+    const advanced = service.calculateAdvanced(input);
+    const simple = service.calculateSimple(input);
+    expect(advanced.mortgage.pmiMonthly).toBe(simple.pmiMonthly);
+    expect(advanced.mortgage.pmiMonthly).toBeCloseTo(159.38, 2);
   });
 
   it('returns zero P&I when loan amount is zero', () => {
