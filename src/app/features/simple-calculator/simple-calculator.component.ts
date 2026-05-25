@@ -29,9 +29,13 @@ export class SimpleCalculatorComponent implements OnInit {
 
   readonly input = signal<SimpleCalculatorInput>(this.buildInputFromState());
   readonly result = computed(() => this.calc.calculateSimple(this.input()));
-  readonly downPaymentAmount = computed(
-    () => Math.round(this.input().homePrice * (this.input().downPaymentPercent / 100)),
-  );
+  readonly downPaymentPercentLabel = computed(() => {
+    const pct = this.calc.downPaymentPercent(
+      this.input().homePrice,
+      this.input().downPaymentAmount,
+    );
+    return Math.round(pct * 10) / 10;
+  });
 
   private buildInputFromState(): SimpleCalculatorInput {
     const s = this.sharedState.getSnapshot();
@@ -39,7 +43,7 @@ export class SimpleCalculatorComponent implements OnInit {
     return {
       ...base,
       homePrice: s.homePrice,
-      downPaymentPercent: s.downPaymentPercent,
+      downPaymentAmount: s.downPaymentAmount,
       interestRate: s.interestRate,
       loanTermYears: s.loanTermYears,
     };
@@ -50,7 +54,7 @@ export class SimpleCalculatorComponent implements OnInit {
     const r = this.result();
     this.sharedState.patch({
       homePrice: i.homePrice,
-      downPaymentPercent: i.downPaymentPercent,
+      downPaymentAmount: i.downPaymentAmount,
       interestRate: i.interestRate,
       loanTermYears: i.loanTermYears,
       monthlyPayment: r.monthlyPayment,
@@ -67,8 +71,17 @@ export class SimpleCalculatorComponent implements OnInit {
     const num = Number(raw);
     if (!Number.isFinite(num)) return;
     let v = num;
-    if (key === 'homePrice') v = Math.min(50_000_000, Math.max(0, v));
-    if (key === 'downPaymentPercent') v = Math.min(100, Math.max(0, v));
+    if (key === 'homePrice') {
+      v = Math.min(50_000_000, Math.max(0, v));
+      const prev = this.input();
+      const down = Math.min(prev.downPaymentAmount, v);
+      this.input.update((p) => ({ ...p, homePrice: v, downPaymentAmount: down }));
+      this.syncToSharedState();
+      return;
+    }
+    if (key === 'downPaymentAmount') {
+      v = Math.min(this.input().homePrice, Math.max(0, v));
+    }
     if (key === 'interestRate') v = Math.min(30, Math.max(0, v));
     if (key === 'loanTermYears' && v !== 15 && v !== 20 && v !== 30) return;
     this.update(key, v as SimpleCalculatorInput[typeof key]);

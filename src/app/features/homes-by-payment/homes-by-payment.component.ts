@@ -29,7 +29,7 @@ export class HomesByPaymentComponent implements OnInit {
   readonly loanParams = computed(() => {
     const s = this.sharedState.getSnapshot();
     return {
-      downPaymentPercent: s.downPaymentPercent,
+      downPaymentAmount: s.downPaymentAmount,
       interestRate: s.interestRate,
       loanTermYears: s.loanTermYears,
       hoaMonthly: DEFAULT_SIMPLE_INPUT.hoaMonthly,

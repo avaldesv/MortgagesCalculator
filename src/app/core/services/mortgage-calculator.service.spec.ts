@@ -10,11 +10,11 @@ describe('MortgageCalculatorService', () => {
     service = TestBed.inject(MortgageCalculatorService);
   });
 
-  it('calculates loan amount from home price and down percent', () => {
+  it('calculates loan amount from home price and down payment dollars', () => {
     const result = service.calculateSimple({
       ...DEFAULT_SIMPLE_INPUT,
       homePrice: 400_000,
-      downPaymentPercent: 20,
+      downPaymentAmount: 80_000,
     });
     expect(result.loanAmount).toBe(320_000);
   });
@@ -23,7 +23,7 @@ describe('MortgageCalculatorService', () => {
     const result = service.calculateSimple({
       ...DEFAULT_SIMPLE_INPUT,
       homePrice: 300_000,
-      downPaymentPercent: 20,
+      downPaymentAmount: 60_000,
       interestRate: 6,
       loanTermYears: 30,
       propertyTaxAnnual: 0,
@@ -42,6 +42,11 @@ describe('MortgageCalculatorService', () => {
     expect(result.monthlyPayment).toBeGreaterThan(result.principalAndInterest);
   });
 
+  it('downPaymentPercent derives percent from dollar down', () => {
+    expect(service.downPaymentPercent(425_000, 85_000)).toBeCloseTo(20, 5);
+    expect(service.downPaymentPercent(425_000, 10_000)).toBeCloseTo(2.3529, 2);
+  });
+
   it('estimatePmiMonthly matches loan * 0.5% annual / 12 when down < 20%', () => {
     expect(service.estimatePmiMonthly(360_000, 10)).toBeCloseTo(150, 6);
     expect(service.estimatePmiMonthly(382_500, 10)).toBeCloseTo(159.375, 6);
@@ -57,19 +62,22 @@ describe('MortgageCalculatorService', () => {
     const result = service.calculateSimple({
       ...DEFAULT_SIMPLE_INPUT,
       homePrice: 400_000,
-      downPaymentPercent: 10,
+      downPaymentAmount: 40_000,
       pmiMonthly: 999,
     });
     expect(result.loanAmount).toBe(360_000);
     expect(result.pmiMonthly).toBeCloseTo(150, 2);
     expect(result.breakdown.find((b) => b.key === 'pmi')?.monthly).toBeCloseTo(150, 2);
-    const withoutPmi =
-      result.monthlyPayment -
-      result.principalAndInterest -
-      result.propertyTaxMonthly -
-      result.insuranceMonthly -
-      result.hoaMonthly;
-    expect(withoutPmi).toBeCloseTo(150, 2);
+  });
+
+  it('$10,000 down on $425k home triggers PMI', () => {
+    const result = service.calculateSimple({
+      ...DEFAULT_SIMPLE_INPUT,
+      homePrice: 425_000,
+      downPaymentAmount: 10_000,
+    });
+    expect(result.loanAmount).toBe(415_000);
+    expect(result.pmiMonthly).toBeCloseTo(172.92, 2);
   });
 
   it('default simple input (20% down) shows zero PMI', () => {
@@ -79,11 +87,11 @@ describe('MortgageCalculatorService', () => {
     expect(result.breakdown.some((b) => b.key === 'pmi')).toBe(false);
   });
 
-  it('425k home with 10% down yields ~$159.38/mo PMI', () => {
+  it('425k home with 10% down ($42.5k) yields ~$159.38/mo PMI', () => {
     const result = service.calculateSimple({
       ...DEFAULT_SIMPLE_INPUT,
       homePrice: 425_000,
-      downPaymentPercent: 10,
+      downPaymentAmount: 42_500,
     });
     expect(result.loanAmount).toBe(382_500);
     expect(result.pmiMonthly).toBeCloseTo(159.38, 2);
@@ -92,7 +100,7 @@ describe('MortgageCalculatorService', () => {
   it('sets PMI to zero when down payment is 20% or more', () => {
     const result = service.calculateSimple({
       ...DEFAULT_SIMPLE_INPUT,
-      downPaymentPercent: 20,
+      downPaymentAmount: 85_000,
       pmiMonthly: 999,
     });
     expect(result.pmiMonthly).toBe(0);
@@ -103,7 +111,7 @@ describe('MortgageCalculatorService', () => {
     const input = {
       ...DEFAULT_SIMPLE_INPUT,
       homePrice: 425_000,
-      downPaymentPercent: 10,
+      downPaymentAmount: 42_500,
       extraMonthlyPayment: 100,
     };
     const advanced = service.calculateAdvanced(input);
@@ -112,20 +120,28 @@ describe('MortgageCalculatorService', () => {
     expect(advanced.mortgage.pmiMonthly).toBeCloseTo(159.38, 2);
   });
 
-  it('returns zero P&I when loan amount is zero', () => {
+  it('returns zero P&I when down payment equals home price', () => {
     const result = service.calculateSimple({
       ...DEFAULT_SIMPLE_INPUT,
-      downPaymentPercent: 100,
+      downPaymentAmount: 425_000,
     });
     expect(result.loanAmount).toBe(0);
     expect(result.principalAndInterest).toBe(0);
+  });
+
+  it('caps down payment at home price', () => {
+    const result = service.calculateSimple({
+      ...DEFAULT_SIMPLE_INPUT,
+      downPaymentAmount: 500_000,
+    });
+    expect(result.loanAmount).toBe(0);
   });
 
   it('builds amortization schedule that pays off loan', () => {
     const mortgage = service.calculateSimple({
       ...DEFAULT_SIMPLE_INPUT,
       homePrice: 400_000,
-      downPaymentPercent: 20,
+      downPaymentAmount: 80_000,
       interestRate: 6.75,
       loanTermYears: 30,
       propertyTaxAnnual: 0,
@@ -150,7 +166,7 @@ describe('MortgageCalculatorService', () => {
     const mortgage = service.calculateSimple({
       ...DEFAULT_SIMPLE_INPUT,
       homePrice: 250_000,
-      downPaymentPercent: 20,
+      downPaymentAmount: 50_000,
       interestRate: 6,
       loanTermYears: 30,
       propertyTaxAnnual: 0,
@@ -197,7 +213,7 @@ describe('MortgageCalculatorService', () => {
     const { rows } = service.compareScenarios({
       ...DEFAULT_SIMPLE_INPUT,
       homePrice: 400_000,
-      downPaymentPercent: 20,
+      downPaymentAmount: 80_000,
       interestRate: 6.5,
     });
     const r15 = rows.find((r) => r.termYears === 15)!;
@@ -207,19 +223,17 @@ describe('MortgageCalculatorService', () => {
     expect(r30.interestSavedVs30).toBe(0);
   });
 
-  it('estimates home price from target monthly payment', () => {
-    const price = service.estimateHomePriceFromMonthlyPayment(
-      2500,
-      {
-        downPaymentPercent: 20,
-        interestRate: 6.75,
-        loanTermYears: 30,
-        hoaMonthly: 0,
-      },
-    );
+  it('estimates home price from target monthly payment with fixed dollar down', () => {
+    const fixedDown = 85_000;
+    const price = service.estimateHomePriceFromMonthlyPayment(2500, {
+      downPaymentAmount: fixedDown,
+      interestRate: 6.75,
+      loanTermYears: 30,
+      hoaMonthly: 0,
+    });
     const check = service.calculateSimple({
       homePrice: price,
-      downPaymentPercent: 20,
+      downPaymentAmount: fixedDown,
       interestRate: 6.75,
       loanTermYears: 30,
       propertyTaxAnnual: price * 0.0127,

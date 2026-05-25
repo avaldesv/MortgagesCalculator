@@ -32,7 +32,10 @@ export class AffordabilityCalculatorComponent implements OnInit {
     const s = this.sharedState.getSnapshot();
     return {
       ...DEFAULT_AFFORDABILITY_INPUT,
-      downPaymentPercent: s.downPaymentPercent,
+      downPaymentPercent:
+        s.homePrice > 0
+          ? this.calc.downPaymentPercent(s.homePrice, s.downPaymentAmount)
+          : DEFAULT_AFFORDABILITY_INPUT.downPaymentPercent,
       interestRate: s.interestRate,
       loanTermYears: s.loanTermYears,
       currentMonthlyHousing: s.monthlyPayment,

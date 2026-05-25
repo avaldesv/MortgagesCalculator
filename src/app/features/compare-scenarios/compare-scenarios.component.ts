@@ -31,7 +31,7 @@ export class CompareScenariosComponent {
     return {
       ...DEFAULT_SIMPLE_INPUT,
       homePrice: s.homePrice,
-      downPaymentPercent: s.downPaymentPercent,
+      downPaymentAmount: s.downPaymentAmount,
       interestRate: s.interestRate,
     };
   }
@@ -41,8 +41,15 @@ export class CompareScenariosComponent {
     if (!Number.isFinite(num)) return;
     let v = num;
     if (key === 'homePrice') v = Math.min(50_000_000, Math.max(0, v));
-    if (key === 'downPaymentPercent') v = Math.min(100, Math.max(0, v));
+    if (key === 'downPaymentAmount') {
+      v = Math.min(this.input().homePrice, Math.max(0, v));
+    }
     if (key === 'interestRate') v = Math.min(30, Math.max(0, v));
+    if (key === 'homePrice') {
+      const down = Math.min(this.input().downPaymentAmount, v);
+      this.input.update((prev) => ({ ...prev, homePrice: v, downPaymentAmount: down }));
+      return;
+    }
     this.input.update((prev) => ({ ...prev, [key]: v }));
   }
 

@@ -1,6 +1,7 @@
 export interface SimpleCalculatorInput {
   homePrice: number;
-  downPaymentPercent: number;
+  /** Cash down payment in dollars (capped at home price). */
+  downPaymentAmount: number;
   interestRate: number;
   loanTermYears: 15 | 20 | 30;
   propertyTaxAnnual: number;
@@ -58,7 +59,7 @@ export interface AdvancedCalculatorResult {
 
 export const DEFAULT_SIMPLE_INPUT: SimpleCalculatorInput = {
   homePrice: 425000,
-  downPaymentPercent: 20,
+  downPaymentAmount: 85_000,
   interestRate: 6.75,
   loanTermYears: 30,
   propertyTaxAnnual: 5400,

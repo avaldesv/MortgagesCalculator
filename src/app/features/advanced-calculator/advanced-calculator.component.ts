@@ -22,6 +22,13 @@ export class AdvancedCalculatorComponent implements OnInit {
   readonly input = signal<AdvancedCalculatorInput>(this.buildInputFromState());
   readonly result = computed(() => this.calc.calculateAdvanced(this.input()));
   readonly schedulePreview = computed(() => this.result().schedule.slice(0, 12));
+  readonly downPaymentPercentLabel = computed(() => {
+    const pct = this.calc.downPaymentPercent(
+      this.input().homePrice,
+      this.input().downPaymentAmount,
+    );
+    return Math.round(pct * 10) / 10;
+  });
   readonly maxYearlyInterest = computed(() =>
     Math.max(1, ...this.result().yearlySummary.map((y) => y.interestPaid)),
   );
@@ -38,7 +45,7 @@ export class AdvancedCalculatorComponent implements OnInit {
     return {
       ...DEFAULT_ADVANCED_INPUT,
       homePrice: s.homePrice,
-      downPaymentPercent: s.downPaymentPercent,
+      downPaymentAmount: s.downPaymentAmount,
       interestRate: s.interestRate,
       loanTermYears: s.loanTermYears,
     };
@@ -49,7 +56,7 @@ export class AdvancedCalculatorComponent implements OnInit {
     const m = this.result().mortgage;
     this.sharedState.patch({
       homePrice: i.homePrice,
-      downPaymentPercent: i.downPaymentPercent,
+      downPaymentAmount: i.downPaymentAmount,
       interestRate: i.interestRate,
       loanTermYears: i.loanTermYears,
       monthlyPayment: m.monthlyPayment,
@@ -61,8 +68,17 @@ export class AdvancedCalculatorComponent implements OnInit {
     const num = Number(raw);
     if (!Number.isFinite(num)) return;
     let v = num;
-    if (key === 'homePrice') v = Math.min(50_000_000, Math.max(0, v));
-    if (key === 'downPaymentPercent') v = Math.min(100, Math.max(0, v));
+    if (key === 'homePrice') {
+      v = Math.min(50_000_000, Math.max(0, v));
+      const prev = this.input();
+      const down = Math.min(prev.downPaymentAmount, v);
+      this.input.update((p) => ({ ...p, homePrice: v, downPaymentAmount: down }));
+      this.syncToSharedState();
+      return;
+    }
+    if (key === 'downPaymentAmount') {
+      v = Math.min(this.input().homePrice, Math.max(0, v));
+    }
     if (key === 'interestRate') v = Math.min(30, Math.max(0, v));
     if (key === 'extraMonthlyPayment') v = Math.max(0, v);
     this.input.update((prev) => ({ ...prev, [key]: v }));

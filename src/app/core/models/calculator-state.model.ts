@@ -1,6 +1,6 @@
 export interface CalculatorStateSnapshot {
   homePrice: number;
-  downPaymentPercent: number;
+  downPaymentAmount: number;
   interestRate: number;
   loanTermYears: 15 | 20 | 30;
   zipCode: string;
@@ -10,7 +10,7 @@ export interface CalculatorStateSnapshot {
 
 export const DEFAULT_CALCULATOR_STATE: CalculatorStateSnapshot = {
   homePrice: 425000,
-  downPaymentPercent: 20,
+  downPaymentAmount: 85_000,
   interestRate: 6.75,
   loanTermYears: 30,
   zipCode: '',

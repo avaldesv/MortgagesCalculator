@@ -12,11 +12,11 @@ describe('CalculatorStateService', () => {
   });
 
   it('patch updates snapshot fields', () => {
-    service.patch({ homePrice: 500000, downPaymentPercent: 10 });
+    service.patch({ homePrice: 500000, downPaymentAmount: 50_000 });
     const s = service.getSnapshot();
     expect(s.homePrice).toBe(500000);
-    expect(s.downPaymentPercent).toBe(10);
-    expect(s.loanAmount).toBe(450000);
+    expect(s.downPaymentAmount).toBe(50_000);
+    expect(s.loanAmount).toBe(450_000);
   });
 
   it('reset restores defaults', () => {
@@ -27,7 +27,7 @@ describe('CalculatorStateService', () => {
 
   it('persists to sessionStorage on patch', () => {
     service.patch({ zipCode: '32801' });
-    const raw = sessionStorage.getItem('mortgagecalc_calculator_state_v1');
+    const raw = sessionStorage.getItem('mortgagecalc_calculator_state_v2');
     expect(raw).toContain('32801');
   });
 });

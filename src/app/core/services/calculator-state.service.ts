@@ -5,7 +5,8 @@ import {
 } from '../models/calculator-state.model';
 import { MortgageCalculatorService } from './mortgage-calculator.service';
 
-const STORAGE_KEY = 'mortgagecalc_calculator_state_v1';
+const STORAGE_KEY = 'mortgagecalc_calculator_state_v2';
+const LEGACY_STORAGE_KEY = 'mortgagecalc_calculator_state_v1';
 
 @Injectable({ providedIn: 'root' })
 export class CalculatorStateService {
@@ -16,7 +17,7 @@ export class CalculatorStateService {
   readonly snapshot = computed(() => this.state());
 
   readonly homePrice = computed(() => this.state().homePrice);
-  readonly downPaymentPercent = computed(() => this.state().downPaymentPercent);
+  readonly downPaymentAmount = computed(() => this.state().downPaymentAmount);
   readonly interestRate = computed(() => this.state().interestRate);
   readonly loanTermYears = computed(() => this.state().loanTermYears);
   readonly zipCode = computed(() => this.state().zipCode);
@@ -34,6 +35,7 @@ export class CalculatorStateService {
   reset(): void {
     this.state.set(this.withDerived({ ...DEFAULT_CALCULATOR_STATE }));
     sessionStorage.removeItem(STORAGE_KEY);
+    sessionStorage.removeItem(LEGACY_STORAGE_KEY);
   }
 
   getSnapshot(): CalculatorStateSnapshot {
@@ -45,7 +47,7 @@ export class CalculatorStateService {
     const s = this.state();
     const result = this.mortgage.calculateSimple({
       homePrice: s.homePrice,
-      downPaymentPercent: s.downPaymentPercent,
+      downPaymentAmount: s.downPaymentAmount,
       interestRate: s.interestRate,
       loanTermYears: s.loanTermYears,
       propertyTaxAnnual: 5400,
@@ -60,19 +62,41 @@ export class CalculatorStateService {
   }
 
   private withDerived(s: CalculatorStateSnapshot): CalculatorStateSnapshot {
-    const loanAmount = Math.max(0, s.homePrice * (1 - s.downPaymentPercent / 100));
-    return { ...s, loanAmount };
+    const down = Math.min(Math.max(0, s.downPaymentAmount), s.homePrice);
+    const loanAmount = Math.max(0, s.homePrice - down);
+    return { ...s, downPaymentAmount: down, loanAmount };
   }
 
   private loadFromSession(): CalculatorStateSnapshot {
     try {
-      const raw = sessionStorage.getItem(STORAGE_KEY);
+      const raw =
+        sessionStorage.getItem(STORAGE_KEY) ?? sessionStorage.getItem(LEGACY_STORAGE_KEY);
       if (!raw) return this.withDerived({ ...DEFAULT_CALCULATOR_STATE });
-      const parsed = JSON.parse(raw) as CalculatorStateSnapshot;
-      return this.withDerived({ ...DEFAULT_CALCULATOR_STATE, ...parsed });
+      const parsed = JSON.parse(raw) as CalculatorStateSnapshot & {
+        downPaymentPercent?: number;
+      };
+      const migrated = this.migrateSnapshot(parsed);
+      return this.withDerived({ ...DEFAULT_CALCULATOR_STATE, ...migrated });
     } catch {
       return this.withDerived({ ...DEFAULT_CALCULATOR_STATE });
     }
+  }
+
+  private migrateSnapshot(
+    parsed: CalculatorStateSnapshot & { downPaymentPercent?: number },
+  ): CalculatorStateSnapshot {
+    if (
+      typeof parsed.downPaymentAmount === 'number' &&
+      Number.isFinite(parsed.downPaymentAmount)
+    ) {
+      return parsed;
+    }
+    const homePrice = parsed.homePrice ?? DEFAULT_CALCULATOR_STATE.homePrice;
+    const pct = parsed.downPaymentPercent ?? 20;
+    return {
+      ...parsed,
+      downPaymentAmount: Math.round(homePrice * (pct / 100)),
+    };
   }
 
   private persist(): void {

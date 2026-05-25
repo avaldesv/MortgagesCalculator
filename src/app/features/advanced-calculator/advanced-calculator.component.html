@@ -19,8 +19,17 @@
       </label>
 
       <label class="field">
-        <span>Down Payment (%)</span>
-        <input type="number" [ngModel]="input().downPaymentPercent" (ngModelChange)="onNumberChange('downPaymentPercent', $event)" name="down" min="0" max="100" step="0.5" />
+        <span>Down Payment ($)</span>
+        <input
+          type="number"
+          [ngModel]="input().downPaymentAmount"
+          (ngModelChange)="onNumberChange('downPaymentAmount', $event)"
+          name="down"
+          min="0"
+          [max]="input().homePrice"
+          step="1000"
+        />
+        <span class="field__hint">≈ {{ downPaymentPercentLabel() }}% of home price</span>
       </label>
 
       <label class="field">

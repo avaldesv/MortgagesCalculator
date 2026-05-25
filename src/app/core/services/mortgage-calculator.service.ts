@@ -33,9 +33,16 @@ export class MortgageCalculatorService {
     return (loanAmount * PMI_ANNUAL_RATE) / 12;
   }
 
+  downPaymentPercent(homePrice: number, downPaymentAmount: number): number {
+    if (homePrice <= 0) return 0;
+    const down = Math.min(Math.max(0, downPaymentAmount), homePrice);
+    return (down / homePrice) * 100;
+  }
+
   calculateSimple(input: SimpleCalculatorInput): MortgageResult {
-    const downAmount = input.homePrice * (input.downPaymentPercent / 100);
+    const downAmount = Math.min(Math.max(0, input.downPaymentAmount), input.homePrice);
     const loanAmount = Math.max(0, input.homePrice - downAmount);
+    const downPaymentPercent = this.downPaymentPercent(input.homePrice, downAmount);
     const principalAndInterest = this.principalAndInterest(
       loanAmount,
       input.interestRate,
@@ -43,7 +50,7 @@ export class MortgageCalculatorService {
     );
     const propertyTaxMonthly = input.propertyTaxAnnual / 12;
     const insuranceMonthly = input.insuranceAnnual / 12;
-    const pmiMonthly = this.estimatePmiMonthly(loanAmount, input.downPaymentPercent);
+    const pmiMonthly = this.estimatePmiMonthly(loanAmount, downPaymentPercent);
     const hoaMonthly = input.hoaMonthly;
 
     const parts: Omit<PaymentBreakdownItem, 'percent'>[] = [
@@ -86,23 +93,64 @@ export class MortgageCalculatorService {
     targetMonthlyPayment: number,
     params: Pick<
       SimpleCalculatorInput,
-      'downPaymentPercent' | 'interestRate' | 'loanTermYears' | 'hoaMonthly'
+      'downPaymentAmount' | 'interestRate' | 'loanTermYears' | 'hoaMonthly'
     >,
     taxRatePercent = 1.27,
     insuranceRatePercent = 0.42,
   ): number {
-    const input: AffordabilityInput = {
-      annualGrossIncome: 0,
-      monthlyDebtPayments: 0,
-      downPaymentPercent: params.downPaymentPercent,
-      interestRate: params.interestRate,
-      loanTermYears: params.loanTermYears,
-      propertyTaxRatePercent: taxRatePercent,
-      insuranceRatePercent: insuranceRatePercent,
-      hoaMonthly: params.hoaMonthly,
-      currentMonthlyHousing: 0,
-    };
-    return this.estimateMaxHomePrice(input, targetMonthlyPayment);
+    return this.estimateMaxHomePriceWithFixedDown(
+      {
+        annualGrossIncome: 0,
+        monthlyDebtPayments: 0,
+        downPaymentAmount: params.downPaymentAmount,
+        interestRate: params.interestRate,
+        loanTermYears: params.loanTermYears,
+        propertyTaxRatePercent: taxRatePercent,
+        insuranceRatePercent: insuranceRatePercent,
+        hoaMonthly: params.hoaMonthly,
+        currentMonthlyHousing: 0,
+      },
+      targetMonthlyPayment,
+    );
+  }
+
+  private estimateMaxHomePriceWithFixedDown(
+    input: Omit<AffordabilityInput, 'downPaymentPercent'> & { downPaymentAmount: number },
+    maxMonthlyPayment: number,
+  ): number {
+    if (maxMonthlyPayment <= 0) return 0;
+
+    let low = 0;
+    let high = 5_000_000;
+    for (let i = 0; i < 40; i++) {
+      const mid = (low + high) / 2;
+      const payment = this.monthlyHousingForPriceWithFixedDown(mid, input);
+      if (payment <= maxMonthlyPayment) {
+        low = mid;
+      } else {
+        high = mid;
+      }
+    }
+    return Math.round(low);
+  }
+
+  private monthlyHousingForPriceWithFixedDown(
+    homePrice: number,
+    input: Omit<AffordabilityInput, 'downPaymentPercent'> & { downPaymentAmount: number },
+  ): number {
+    const propertyTaxAnnual = homePrice * (input.propertyTaxRatePercent / 100);
+    const insuranceAnnual = homePrice * (input.insuranceRatePercent / 100);
+    const downAmount = Math.min(Math.max(0, input.downPaymentAmount), homePrice);
+    return this.calculateSimple({
+      homePrice,
+      downPaymentAmount: downAmount,
+      interestRate: input.interestRate,
+      loanTermYears: input.loanTermYears,
+      propertyTaxAnnual,
+      insuranceAnnual,
+      pmiMonthly: 0,
+      hoaMonthly: input.hoaMonthly,
+    }).monthlyPayment;
   }
 
   compareScenarios(input: SimpleCalculatorInput): CompareScenariosResult {
@@ -246,16 +294,15 @@ export class MortgageCalculatorService {
   private monthlyHousingForPrice(homePrice: number, input: AffordabilityInput): number {
     const propertyTaxAnnual = homePrice * (input.propertyTaxRatePercent / 100);
     const insuranceAnnual = homePrice * (input.insuranceRatePercent / 100);
-    const loanAmount = Math.max(0, homePrice * (1 - input.downPaymentPercent / 100));
-    const pmiMonthly = this.estimatePmiMonthly(loanAmount, input.downPaymentPercent);
+    const downAmount = homePrice * (input.downPaymentPercent / 100);
     return this.calculateSimple({
       homePrice,
-      downPaymentPercent: input.downPaymentPercent,
+      downPaymentAmount: downAmount,
       interestRate: input.interestRate,
       loanTermYears: input.loanTermYears,
       propertyTaxAnnual,
       insuranceAnnual,
-      pmiMonthly,
+      pmiMonthly: 0,
       hoaMonthly: input.hoaMonthly,
     }).monthlyPayment;
   }
