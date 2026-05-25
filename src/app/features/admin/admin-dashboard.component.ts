@@ -68,6 +68,12 @@ import { MarketListingsService } from '../../core/services/market-listings.servi
           (<a href="https://straply.com/dashboard" target="_blank" rel="noopener">straply.com/dashboard</a>).
         </p>
         @if (marketSettings(); as m) {
+          @if (m.enabled && m.straplyConfigured === false) {
+            <p class="admin-warn" role="alert">
+              Straply key missing on the <strong>backend</strong> service in Railway. Add variable
+              <code>STRAPLY_API_KEY</code>, redeploy API, then refresh this page. Until then, no homes appear on the site.
+            </p>
+          }
           <label class="admin-toggle admin-toggle--block">
             <input type="checkbox" [checked]="m.enabled" (change)="toggleMarketEnabled($event)" />
             Show module on site
@@ -163,6 +169,15 @@ import { MarketListingsService } from '../../core/services/market-listings.servi
       margin: 0 0 0.75rem;
       font-size: 0.85rem;
       color: var(--color-muted);
+    }
+    .admin-warn {
+      margin: 0 0 0.75rem;
+      padding: 0.65rem 0.75rem;
+      font-size: 0.85rem;
+      color: #92400e;
+      background: #fffbeb;
+      border: 1px solid #fcd34d;
+      border-radius: var(--radius-sm);
     }
     .admin-toggle--block {
       margin-bottom: 0.75rem;

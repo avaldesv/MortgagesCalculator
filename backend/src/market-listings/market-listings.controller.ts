@@ -22,7 +22,7 @@ export class MarketListingsAdminController {
 
   @Get('settings')
   getSettings() {
-    return this.market.getSettings();
+    return this.market.getSettingsForAdmin();
   }
 
   @Patch('settings')

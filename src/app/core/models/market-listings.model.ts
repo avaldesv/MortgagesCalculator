@@ -11,6 +11,8 @@ export interface MarketListingsSettings {
   zipCode: string;
   label: string;
   updatedAt: string;
+  /** Present on admin GET only — server has STRAPLY_API_KEY env */
+  straplyConfigured?: boolean;
 }
 
 export interface UsMarketListing {

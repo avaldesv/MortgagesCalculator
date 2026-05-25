@@ -26,6 +26,15 @@ export class MarketListingsService {
     return { ...DEFAULT_MARKET_LISTINGS_SETTINGS, ...stored, zipCode: stored?.zipCode ?? DEFAULT_MARKET_LISTINGS_SETTINGS.zipCode };
   }
 
+  getAdminStatus(): { straplyConfigured: boolean } {
+    return { straplyConfigured: Boolean(process.env.STRAPLY_API_KEY?.trim()) };
+  }
+
+  async getSettingsForAdmin(): Promise<MarketListingsSettings & { straplyConfigured: boolean }> {
+    const settings = await this.getSettings();
+    return { ...settings, ...this.getAdminStatus() };
+  }
+
   async updateSettings(patch: Partial<MarketListingsSettings>): Promise<MarketListingsSettings> {
     const current = await this.getSettings();
     const next: MarketListingsSettings = {
