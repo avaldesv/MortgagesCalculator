@@ -253,6 +253,9 @@ API **placements** y **listings** (público + admin).
 - \`ad-placements/\`, \`listings/\` controllers + services
 - Seed con listings de ejemplo FL
 
+## Registro de cambios
+- **2026-05-25** — Bugfix: \`GET admin/ad-placements\` usa \`await listAll()\` tras store async (\`b64bd15\`)
+
 ## Pendiente
 - Filtros avanzados listings si se requiere en P1
 
@@ -286,14 +289,18 @@ FE consume **API de placements** (no config estático en prod).
 
 ## Qué hacer
 - [x] Login admin
-- [x] Toggle placement, CRUD listing en una pantalla
+- [x] Toggle placement, toggle listing active
+- [x] Listar placements y listings en dashboard
 
 ## Entregado
 - \`/admin\`, \`/admin/login\`
-- \`AdminDashboardComponent\`
+- \`AdminDashboardComponent\` con errores de carga visibles
+
+## Registro de cambios
+- **2026-05-25** — Bugfix: dashboard vacío — API admin no hacía \`await\`; FE valida array + mensajes error (\`b64bd15\`)
 
 ## Pendiente
-- UX admin P1 (validaciones, confirmaciones)
+- P1: crear/editar listing, formulario placement completo
 
 ## Referencias
 - \`src/app/features/admin/\``,

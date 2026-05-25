@@ -40,3 +40,12 @@ Copia cada issue desde [GATE-issues.md](./GATE-issues.md) y [P0-A-issues.md](./P
 
 - Marca `[GATE-0]` y `[GATE-1]` como **Done** cuando el PR `docs/gates-0-1` esté en `main`.
 - No muevas issues P0-A a In Progress hasta que ambos gates estén Done.
+
+## Bugfixes y cada cambio en código
+
+**Obligatorio** (ver `.cursor/rules/linear-sync.mdc`):
+
+```powershell
+node scripts/linear-log-change.mjs AVV-32,AVV-30 "Descripción del fix" b64bd15
+node scripts/linear-sync-descriptions.mjs --descriptions-only  # si actualizaste plantillas en el script
+```
