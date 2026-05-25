@@ -74,6 +74,29 @@ export class MortgageCalculatorService {
     return { ...DEFAULT_SIMPLE_INPUT };
   }
 
+  estimateHomePriceFromMonthlyPayment(
+    targetMonthlyPayment: number,
+    params: Pick<
+      SimpleCalculatorInput,
+      'downPaymentPercent' | 'interestRate' | 'loanTermYears' | 'hoaMonthly'
+    >,
+    taxRatePercent = 1.27,
+    insuranceRatePercent = 0.42,
+  ): number {
+    const input: AffordabilityInput = {
+      annualGrossIncome: 0,
+      monthlyDebtPayments: 0,
+      downPaymentPercent: params.downPaymentPercent,
+      interestRate: params.interestRate,
+      loanTermYears: params.loanTermYears,
+      propertyTaxRatePercent: taxRatePercent,
+      insuranceRatePercent: insuranceRatePercent,
+      hoaMonthly: params.hoaMonthly,
+      currentMonthlyHousing: 0,
+    };
+    return this.estimateMaxHomePrice(input, targetMonthlyPayment);
+  }
+
   compareScenarios(input: SimpleCalculatorInput): CompareScenariosResult {
     const terms: Array<15 | 20 | 30> = [15, 20, 30];
     const baseline = this.calculateSimple({ ...input, loanTermYears: 30 });

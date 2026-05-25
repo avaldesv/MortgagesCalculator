@@ -1,32 +1,48 @@
-<app-modular-page tabId="homes-by-payment" [monthlyPayment]="desiredPayment">
+<app-modular-page tabId="homes-by-payment" [monthlyPayment]="desiredPayment()">
   <section class="hero card">
     <h1>Find Homes by Monthly Payment</h1>
     <p class="hero__sub">
-      See homes that may fit your estimated monthly budget — search by payment, not just price.
+      Reverse-calculate an estimated max home price, then browse sponsored listings near your budget.
     </p>
   </section>
 
-  <form class="card search-form" (submit)="$event.preventDefault()">
+  <form class="card search-form" (submit)="$event.preventDefault(); onSearch()">
     <div class="search-form__grid">
       <label class="field">
         <span>Desired monthly payment</span>
-        <input type="number" [(ngModel)]="desiredPayment" name="payment" min="500" />
+        <input type="number" [ngModel]="desiredPayment()" (ngModelChange)="desiredPayment.set(+$event || 0)" name="payment" min="500" />
       </label>
       <label class="field">
         <span>ZIP code or city</span>
-        <input type="text" [(ngModel)]="zipCode" name="zip" />
+        <input type="text" [ngModel]="zipCode()" (ngModelChange)="zipCode.set($event)" name="zip" />
+      </label>
+      <label class="field">
+        <span>Min bedrooms</span>
+        <input type="number" [ngModel]="minBedrooms()" (ngModelChange)="minBedrooms.set(+$event || 0)" name="beds" min="0" max="10" />
+      </label>
+      <label class="field">
+        <span>Min bathrooms</span>
+        <input type="number" [ngModel]="minBathrooms()" (ngModelChange)="minBathrooms.set(+$event || 0)" name="baths" min="0" max="10" step="0.5" />
       </label>
     </div>
-    <button type="button" class="btn btn--primary">Search Homes</button>
+    <p class="reverse-estimate">
+      Est. max home price at this payment:
+      <strong>{{ estimatedMaxPrice() | currency: 'USD' : 'symbol' : '1.0-0' }}</strong>
+      (uses your Simple Calculator rate &amp; down payment)
+    </p>
+    <button type="submit" class="btn btn--primary">Search Homes</button>
   </form>
 
   <section class="homes-grid">
-    @for (home of listings; track home.id) {
+    @if (searched() && filteredListings().length === 0) {
+      <p class="empty-state card">No sponsored listings match this payment and filters. Try a higher payment or broader area.</p>
+    }
+    @for (home of filteredListings(); track home.id) {
       <article class="card home-card">
         <div class="home-card__badge">Sponsored Home</div>
         <div class="home-card__image"></div>
         <h3>{{ home.price | currency: 'USD' : 'symbol' : '1.0-0' }}</h3>
-        <p>{{ home.city }}, {{ home.state }}</p>
+        <p>{{ home.city }}, {{ home.state }} @if (home.zip) { · {{ home.zip }} }</p>
         <p class="home-card__payment">
           Est. {{ home.estimatedMonthlyPayment | currency: 'USD' : 'symbol' : '1.0-0' }}/mo
         </p>

@@ -136,4 +136,28 @@ describe('MortgageCalculatorService', () => {
     expect(r15.interestSavedVs30).toBeGreaterThan(0);
     expect(r30.interestSavedVs30).toBe(0);
   });
+
+  it('estimates home price from target monthly payment', () => {
+    const price = service.estimateHomePriceFromMonthlyPayment(
+      2500,
+      {
+        downPaymentPercent: 20,
+        interestRate: 6.75,
+        loanTermYears: 30,
+        hoaMonthly: 0,
+      },
+    );
+    const check = service.calculateSimple({
+      homePrice: price,
+      downPaymentPercent: 20,
+      interestRate: 6.75,
+      loanTermYears: 30,
+      propertyTaxAnnual: price * 0.0127,
+      insuranceAnnual: price * 0.0042,
+      pmiMonthly: 0,
+      hoaMonthly: 0,
+    });
+    expect(check.monthlyPayment).toBeLessThanOrEqual(2500 + 5);
+    expect(price).toBeGreaterThan(200_000);
+  });
 });

@@ -27,6 +27,7 @@ export class ListingsAdConfigService {
     {},
   );
   private readonly listingsCache = signal<SponsoredListing[]>([]);
+  readonly listings = this.listingsCache.asReadonly();
   private listingsLoaded = false;
 
   loadPlacementsForTab(tabId: TabId): void {
@@ -67,7 +68,7 @@ export class ListingsAdConfigService {
 
   getListings(): SponsoredListing[] {
     this.ensureListingsLoaded();
-    return this.listingsCache();
+    return this.listings();
   }
 
   refreshListings(): void {
