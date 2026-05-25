@@ -11,10 +11,12 @@ import { SiteHeaderComponent } from './layout/site-header/site-header.component'
       <app-site-header />
       <router-outlet />
       <footer class="site-footer">
-        <p>
-          © {{ year }} MortgageCalc · Estimates only, not a loan offer.
-          <a routerLink="/admin/login" class="site-footer__admin">Admin</a>
-        </p>
+        <div class="site-footer__inner">
+          <p>
+            © {{ year }} MortgageCalc · Estimates only, not a loan offer.
+            <a routerLink="/admin/login" class="site-footer__admin">Admin</a>
+          </p>
+        </div>
       </footer>
     </div>
   `,

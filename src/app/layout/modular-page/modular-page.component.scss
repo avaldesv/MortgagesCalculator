@@ -7,9 +7,9 @@
     'ad-ml content ad-mr'
     'ad-bl ad-bc ad-br'
     'footer footer footer';
-  max-width: 1400px;
+  max-width: var(--layout-max);
   margin: 0 auto;
-  padding: 1rem 1.25rem 2rem;
+  padding: 1rem var(--layout-gutter) 2rem;
 }
 
 .modular-page__content {
