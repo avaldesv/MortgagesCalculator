@@ -20,9 +20,14 @@ export class UsMarketListingsComponent {
   }
 
   readonly response = computed(() => this.market.snapshotForTab(this.tabId()));
+  readonly enabled = computed(() => this.response()?.meta.enabled === true);
   readonly visible = computed(() => {
     const res = this.response();
-    return res?.meta.enabled === true && (res.data?.length ?? 0) > 0;
+    return this.enabled() && (res?.data?.length ?? 0) > 0;
+  });
+  readonly showUnavailable = computed(() => {
+    const res = this.response();
+    return this.enabled() && (res?.data?.length ?? 0) === 0 && !!res;
   });
   readonly label = computed(() => this.response()?.meta.label ?? 'Homes for sale in the U.S.');
   readonly listings = computed(() => this.response()?.data ?? []);

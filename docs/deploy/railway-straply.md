@@ -1,5 +1,11 @@
 # Railway — Straply (US market listings)
 
+## Checklist (las dos cosas)
+
+1. **`STRAPLY_API_KEY`** en el servicio **backend** (no en web) → sin esto no hay casas reales.
+2. **Admin → US market listings → Show module on site** activado (ZIP `32801`, etc.).
+3. Sponsored es opcional: el bloque de casas sale en la columna derecha aunque **Ad placements** esté desactivado.
+
 ## 1. Variable en el servicio **API** (root `backend/`)
 
 | Variable | Valor |

@@ -1,4 +1,9 @@
-@if (visible()) {
+@if (showUnavailable()) {
+  <section class="us-market us-market--pending" aria-labelledby="us-market-title-pending">
+    <h2 id="us-market-title-pending" class="us-market__title">{{ label() }}</h2>
+    <p class="us-market__pending">Listings are temporarily unavailable. Check back soon.</p>
+  </section>
+} @else if (visible()) {
   <section class="us-market" aria-labelledby="us-market-title">
     <header class="us-market__header">
       <h2 id="us-market-title" class="us-market__title">{{ label() }}</h2>

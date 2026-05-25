@@ -1,3 +1,13 @@
+.us-market--pending {
+  margin-top: 0.875rem;
+}
+
+.us-market__pending {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}
+
 .us-market {
   margin-top: 0.875rem;
   background: var(--color-surface);
