@@ -1,6 +1,8 @@
-# Railway — deploy staging (AVV-34)
+# Railway — deploy staging / production (AVV-34)
 
 Checklist para **Web** (Angular) + **API** (NestJS) + **PostgreSQL** opcional.
+
+**Producción web verificada:** https://mortgagescalculator-production.up.railway.app — FE OK; API aún no en ese host (ver [`railway-production-status.md`](./railway-production-status.md)).
 
 ## 1. Servicios en Railway
 
