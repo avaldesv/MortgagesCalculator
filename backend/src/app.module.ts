@@ -9,6 +9,7 @@ import {
   MarketListingsAdminController,
   MarketListingsPublicController,
 } from './market-listings/market-listings.controller';
+import { GeoIpService } from './market-listings/geo-ip.service';
 import { MarketListingsService } from './market-listings/market-listings.service';
 import { PartnerLeadsController } from './partner-leads/partner-leads.controller';
 import { PartnerLeadsService } from './partner-leads/partner-leads.service';
@@ -30,6 +31,7 @@ import { StoreModule } from './store/store.module';
     AdPlacementsService,
     ListingsService,
     PartnerLeadsService,
+    GeoIpService,
     MarketListingsService,
   ],
 })

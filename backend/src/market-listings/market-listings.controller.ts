@@ -1,6 +1,8 @@
-import { Body, Controller, Get, Patch, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Query, Req, UseGuards } from '@nestjs/common';
+import type { Request } from 'express';
 import type { TabId } from '../store/data-store.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { extractClientIp } from './client-ip.util';
 import { MarketListingsService } from './market-listings.service';
 import type { MarketListingsSettings } from './market-listings.types';
 
@@ -9,9 +11,9 @@ export class MarketListingsPublicController {
   constructor(private readonly market: MarketListingsService) {}
 
   @Get()
-  list(@Query('tab') tab?: string) {
+  list(@Query('tab') tab?: string, @Req() req?: Request) {
     const tabId = (tab ?? 'simple-calculator') as TabId;
-    return this.market.listForTab(tabId);
+    return this.market.listForTab(tabId, req ? extractClientIp(req) : undefined);
   }
 }
 

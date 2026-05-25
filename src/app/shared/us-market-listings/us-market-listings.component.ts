@@ -30,6 +30,15 @@ export class UsMarketListingsComponent {
     return this.enabled() && (res?.data?.length ?? 0) === 0 && !!res;
   });
   readonly label = computed(() => this.response()?.meta.label ?? 'Homes for sale in the U.S.');
+  readonly locationContext = computed(() => {
+    const m = this.response()?.meta;
+    if (!m?.zipCode) return null;
+    if (m.locationSource === 'visitor-geo') {
+      const place = [m.city, m.state].filter(Boolean).join(', ');
+      return place ? `Near you — ${place} (${m.zipCode})` : `Near you — ZIP ${m.zipCode}`;
+    }
+    return `ZIP ${m.zipCode}`;
+  });
   readonly listings = computed(() => this.response()?.data ?? []);
   readonly attribution = computed(() => {
     const src = this.response()?.meta.source;

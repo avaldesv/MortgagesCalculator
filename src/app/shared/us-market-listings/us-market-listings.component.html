@@ -7,9 +7,16 @@
   <section class="us-market" aria-labelledby="us-market-title">
     <header class="us-market__header">
       <h2 id="us-market-title" class="us-market__title">{{ label() }}</h2>
-      @if (attribution()) {
-        <span class="us-market__source">{{ attribution() }}</span>
-      }
+      <span class="us-market__source">
+        @if (locationContext()) {
+          {{ locationContext() }}
+          @if (attribution()) {
+            · {{ attribution() }}
+          }
+        } @else if (attribution()) {
+          {{ attribution() }}
+        }
+      </span>
     </header>
     <ul class="us-market__list">
       @for (home of listings(); track home.id) {

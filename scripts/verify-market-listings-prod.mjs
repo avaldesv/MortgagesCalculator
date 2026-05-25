@@ -23,11 +23,27 @@ async function main() {
   const health = await get(`${API}/api/health`);
   console.log('API health', health.status, health.json?.status ?? health.json);
 
-  const direct = await get(`${API}/api/v1/market-listings?tab=simple-calculator`);
+  const direct = await fetch(`${API}/api/v1/market-listings?tab=simple-calculator`, {
+    headers: {
+      Accept: 'application/json',
+      'X-Forwarded-For': '8.8.8.8',
+    },
+  }).then(async (res) => {
+    const text = await res.text();
+    let json;
+    try {
+      json = JSON.parse(text);
+    } catch {
+      json = { raw: text.slice(0, 200) };
+    }
+    return { status: res.status, json };
+  });
   console.log('API market-listings (direct)', direct.status, {
     source: direct.json?.meta?.source,
     enabled: direct.json?.meta?.enabled,
     count: direct.json?.data?.length ?? 0,
+    zipCode: direct.json?.meta?.zipCode,
+    locationSource: direct.json?.meta?.locationSource,
     message: direct.json?.meta?.message,
   });
   if (direct.status === 404) {

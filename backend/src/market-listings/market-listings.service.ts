@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import type { TabId } from '../store/data-store.service';
 import { DataStoreService } from '../store/data-store.service';
+import { GeoIpService } from './geo-ip.service';
 import { fetchStraplyProperties } from './straply.client';
 import {
   DEFAULT_MARKET_LISTINGS_SETTINGS,
@@ -19,7 +20,10 @@ export class MarketListingsService {
     fetchedAt: number;
   } | null = null;
 
-  constructor(private readonly store: DataStoreService) {}
+  constructor(
+    private readonly store: DataStoreService,
+    private readonly geoIp: GeoIpService,
+  ) {}
 
   async getSettings(): Promise<MarketListingsSettings> {
     const stored = await this.store.getMarketListingsSettings();
@@ -48,7 +52,10 @@ export class MarketListingsService {
     return next;
   }
 
-  async listForTab(tabId: TabId): Promise<{
+  async listForTab(
+    tabId: TabId,
+    clientIp?: string,
+  ): Promise<{
     data: UsMarketListing[];
     meta: {
       enabled: boolean;
@@ -56,6 +63,10 @@ export class MarketListingsService {
       label?: string;
       cachedAt?: string;
       message?: string;
+      zipCode?: string;
+      locationSource?: 'visitor-geo' | 'admin-fallback';
+      city?: string;
+      state?: string;
     };
   }> {
     const settings = await this.getSettings();
@@ -76,7 +87,13 @@ export class MarketListingsService {
       };
     }
 
-    const zip = settings.zipCode?.trim();
+    const geo = await this.geoIp.resolveUsLocation(clientIp);
+    const fallbackZip = settings.zipCode?.trim();
+    const zip = geo?.zipCode ?? fallbackZip;
+    const city = geo?.city ?? settings.city;
+    const state = geo?.state ?? settings.state;
+    const locationSource = geo ? ('visitor-geo' as const) : ('admin-fallback' as const);
+
     if (!zip) {
       return {
         data: [],
@@ -85,6 +102,7 @@ export class MarketListingsService {
           source: 'unconfigured',
           label: settings.label,
           message: 'Set ZIP code in admin (Straply search requires zipCode).',
+          locationSource,
         },
       };
     }
@@ -99,15 +117,21 @@ export class MarketListingsService {
           enabled: true,
           source: 'straply',
           label: settings.label,
+          zipCode: zip,
+          locationSource,
+          city,
+          state,
           cachedAt: new Date(this.cache.fetchedAt).toISOString(),
         },
       };
     }
 
+    const locationMeta = { zipCode: zip, locationSource, city, state };
+
     try {
       const listings = await fetchStraplyProperties(apiKey, {
-        city: settings.city,
-        state: settings.state,
+        city,
+        state,
         zipCode: zip,
         limit,
       });
@@ -119,6 +143,7 @@ export class MarketListingsService {
           source: 'straply',
           label: settings.label,
           cachedAt: new Date(now).toISOString(),
+          ...locationMeta,
         },
       };
     } catch (err) {
@@ -132,10 +157,14 @@ export class MarketListingsService {
             label: settings.label,
             cachedAt: new Date(this.cache.fetchedAt).toISOString(),
             message,
+            ...locationMeta,
           },
         };
       }
-      return { data: [], meta: { enabled: true, source: 'error', label: settings.label, message } };
+      return {
+        data: [],
+        meta: { enabled: true, source: 'error', label: settings.label, message, ...locationMeta },
+      };
     }
   }
 }

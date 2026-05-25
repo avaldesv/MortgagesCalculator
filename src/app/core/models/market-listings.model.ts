@@ -40,5 +40,9 @@ export interface MarketListingsResponse {
     label?: string;
     cachedAt?: string;
     message?: string;
+    zipCode?: string;
+    locationSource?: 'visitor-geo' | 'admin-fallback';
+    city?: string;
+    state?: string;
   };
 }

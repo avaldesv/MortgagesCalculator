@@ -64,7 +64,8 @@ import { MarketListingsService } from '../../core/services/market-listings.servi
       <div class="card">
         <h2>US market listings (Straply)</h2>
         <p class="admin-hint">
-          Real for-sale homes shown below sponsored ads. Requires <code>STRAPLY_API_KEY</code> on the API
+          Listings use the visitor&apos;s IP to detect US ZIP (ipapi.co), then Straply. Fallback ZIP/city below if
+          geo fails. Requires <code>STRAPLY_API_KEY</code> on the API
           (<a href="https://straply.com/dashboard" target="_blank" rel="noopener">straply.com/dashboard</a>).
         </p>
         @if (marketSettings(); as m) {
