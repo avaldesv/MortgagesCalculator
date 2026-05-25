@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "MarketListingsConfig" ADD COLUMN IF NOT EXISTS "zipCode" TEXT NOT NULL DEFAULT '32801';

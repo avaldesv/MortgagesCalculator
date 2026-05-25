@@ -34,6 +34,12 @@
   }
 }
 
+.modular-page__ad-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
 .modular-page__ad-slot--empty {
   display: none;
 }

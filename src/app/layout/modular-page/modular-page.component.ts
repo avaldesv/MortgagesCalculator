@@ -3,11 +3,12 @@ import { AD_PAGE_POSITIONS } from '../../core/models/listings-ad.model';
 import type { TabId } from '../../core/models/tab.model';
 import { ListingsAdConfigService } from '../../core/services/listings-ad-config.service';
 import { ListingsAdComponent } from '../../shared/listings-ad/listings-ad.component';
+import { UsMarketListingsComponent } from '../../shared/us-market-listings/us-market-listings.component';
 
 @Component({
   selector: 'app-modular-page',
   standalone: true,
-  imports: [ListingsAdComponent],
+  imports: [ListingsAdComponent, UsMarketListingsComponent],
   templateUrl: './modular-page.component.html',
   styleUrl: './modular-page.component.scss',
 })

@@ -14,6 +14,7 @@ alwaysApply: true
 | Empezar feature/issue | `--in-progress AVV-XX` |
 | Criterios cumplidos en `main` | `--done AVV-XX` |
 | **Bug detectado o corregido** | `linear-log-change.mjs` + issue(s) afectados |
+| **Feature nueva** | Crear epic + sub-issues en Linear **antes** de codificar (`linear-create-*-subs.mjs`) |
 | Entrega grande / reconciliar | `linear-sync-descriptions.mjs` |
 
 ## Scripts (`LINEAR_API_KEY` en env o `.env.local`, nunca en git)
@@ -38,6 +39,7 @@ node scripts/linear-log-change.mjs AVV-32,AVV-30 "Admin: await async en GET admi
 | Admin UI | AVV-32 |
 | API placements/listings | AVV-30 |
 | FE placements / Homes | AVV-31, AVV-42 |
+| US market listings (Straply) | AVV-46 (epic), AVV-47–51 (subs) |
 | Auth | AVV-29 |
 | Railway / deploy | AVV-34 |
 | Prisma / persistencia | AVV-28 |

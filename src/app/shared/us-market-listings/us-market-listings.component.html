@@ -1,0 +1,34 @@
+@if (visible()) {
+  <section class="us-market" aria-labelledby="us-market-title">
+    <header class="us-market__header">
+      <h2 id="us-market-title" class="us-market__title">{{ label() }}</h2>
+      @if (attribution()) {
+        <span class="us-market__source">{{ attribution() }}</span>
+      }
+    </header>
+    <ul class="us-market__list">
+      @for (home of listings(); track home.id) {
+        <li class="us-market__card">
+          <div class="us-market__image" role="img" [attr.aria-label]="home.addressLine"></div>
+          <div class="us-market__body">
+            <p class="us-market__price">{{ home.price | currency: 'USD' : 'symbol' : '1.0-0' }}</p>
+            <p class="us-market__address">{{ home.addressLine }}</p>
+            <p class="us-market__payment">
+              Est. {{ home.estimatedMonthlyPayment | currency: 'USD' : 'symbol' : '1.0-0' }}/mo
+            </p>
+            <p class="us-market__meta">
+              {{ home.bedrooms }} Bed · {{ home.bathrooms }} Bath ·
+              {{ home.squareFeet | number }} sq ft
+              @if (home.daysOnMarket != null) {
+                · {{ home.daysOnMarket }} days on market
+              }
+            </p>
+            <a class="us-market__cta" [href]="home.listingUrl" target="_blank" rel="noopener noreferrer">
+              View listing
+            </a>
+          </div>
+        </li>
+      }
+    </ul>
+  </section>
+}

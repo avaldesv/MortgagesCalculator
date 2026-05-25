@@ -41,6 +41,16 @@ Copia cada issue desde [GATE-issues.md](./GATE-issues.md) y [P0-A-issues.md](./P
 - Marca `[GATE-0]` y `[GATE-1]` como **Done** cuando el PR `docs/gates-0-1` esté en `main`.
 - No muevas issues P0-A a In Progress hasta que ambos gates estén Done.
 
+## Feature nueva (ej. US market listings)
+
+1. Crear epic + sub-issues **antes** de codificar:
+   ```powershell
+   node scripts/linear-create-market-listings-issue.mjs   # epic AVV-46 si falta
+   node scripts/linear-create-market-listings-subs.mjs    # AVV-47–51
+   ```
+2. Implementar y marcar sub-issues en Linear (`--in-progress` / `--done`).
+3. Registrar cambios: `linear-log-change.mjs` + `linear-sync-descriptions.mjs`.
+
 ## Bugfixes y cada cambio en código
 
 **Obligatorio** (ver `.cursor/rules/linear-sync.mdc`):

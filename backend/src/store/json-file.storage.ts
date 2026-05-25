@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import {
   AdPlacement,
+  MarketListingsSettings,
   PartnerLead,
   SponsoredListing,
 } from './data-store.service';
@@ -9,6 +10,7 @@ interface StoreData {
   placements: AdPlacement[];
   listings: SponsoredListing[];
   partnerLeads?: PartnerLead[];
+  marketListingsSettings?: MarketListingsSettings;
 }
 
 export class JsonFileStorage {
@@ -28,6 +30,13 @@ export class JsonFileStorage {
     if (!this.data.partnerLeads) {
       this.data.partnerLeads = [];
       this.persist();
+    }
+    if (!this.data.marketListingsSettings) {
+      const seed = JSON.parse(readFileSync(this.seedPath, 'utf8')) as StoreData;
+      if (seed.marketListingsSettings) {
+        this.data.marketListingsSettings = seed.marketListingsSettings;
+        this.persist();
+      }
     }
   }
 
@@ -88,5 +97,16 @@ export class JsonFileStorage {
 
   getPartnerLeads(): PartnerLead[] {
     return [...(this.data.partnerLeads ?? [])];
+  }
+
+  getMarketListingsSettings(): MarketListingsSettings | undefined {
+    return this.data.marketListingsSettings
+      ? { ...this.data.marketListingsSettings }
+      : undefined;
+  }
+
+  setMarketListingsSettings(settings: MarketListingsSettings): void {
+    this.data.marketListingsSettings = settings;
+    this.persist();
   }
 }

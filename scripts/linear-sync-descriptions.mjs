@@ -540,6 +540,75 @@ Tab **Compare Scenarios** — DoD L2: presets 15/20/30, tabla y gráfico ahorro 
 ## Pendiente
 - Contenido largo / CMS (P1)`,
   },
+  'AVV-46': {
+    state: 'done',
+    description: `## Objetivo
+**Epic P1-01** — US market listings debajo de Sponsored con **Straply**.
+
+## Sub-issues
+- AVV-47 P1-01a Diseño + Linear
+- AVV-48 P1-01b Backend
+- AVV-49 P1-01c FE
+- AVV-50 P1-01d Admin
+- AVV-51 P1-01e Deploy prod
+
+## Fuente
+- \`GET https://api.straply.com/v1/properties\`
+- \`STRAPLY_API_KEY\` (Bearer)
+
+## Registro de cambios
+- Migración RentCast → Straply
+- Sub-issues AVV-47–51 creadas`,
+  },
+  'AVV-47': {
+    state: 'done',
+    description: `## Objetivo
+Diseño y tracking Linear para market listings (Straply).
+
+## Entregado
+- Sub-issues AVV-48–51 bajo AVV-46
+- \`scripts/linear-create-market-listings-subs.mjs\`
+- \`docs/features/us-market-listings.md\``,
+  },
+  'AVV-48': {
+    state: 'done',
+    description: `## Objetivo
+Backend NestJS — proxy Straply + settings + caché.
+
+## Entregado
+- \`straply.client.ts\`, \`market-listings.service.ts\`
+- \`STRAPLY_API_KEY\` en \`.env.example\`
+
+## Pendiente
+- Key en Railway`,
+  },
+  'AVV-49': {
+    state: 'done',
+    description: `## Objetivo
+FE \`app-us-market-listings\` debajo de sponsored.
+
+## Entregado
+- \`ModularPageComponent\` ad-stack
+- \`MarketListingsService\``,
+  },
+  'AVV-50': {
+    state: 'done',
+    description: `## Objetivo
+Admin: enabled, maxCount, city/state, label.
+
+## Entregado
+- Sección en \`admin-dashboard.component.ts\``,
+  },
+  'AVV-51': {
+    state: 'backlog',
+    description: `## Objetivo
+Deploy API con \`STRAPLY_API_KEY\` y verificar módulo en prod.
+
+## Pendiente
+- [ ] Variable en Railway
+- [ ] Redeploy backend
+- [ ] Smoke admin + calculadora`,
+  },
   'AVV-45': {
     state: 'done',
     description: `## Objetivo

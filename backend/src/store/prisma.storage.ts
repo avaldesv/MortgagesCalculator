@@ -4,6 +4,7 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   AdPlacement,
+  MarketListingsSettings,
   PartnerLead,
   SponsoredListing,
   TabsTarget,
@@ -12,12 +13,22 @@ interface SeedFile {
   placements: AdPlacement[];
   listings: SponsoredListing[];
   partnerLeads?: PartnerLead[];
+  marketListingsSettings?: MarketListingsSettings;
 }
 
 export class PrismaStorage {
   constructor(private readonly prisma: PrismaService) {}
 
   async init(): Promise<void> {
+    const marketCount = await this.prisma.marketListingsConfig.count();
+    if (marketCount === 0) {
+      const seedPath = join(process.cwd(), 'data', 'seed.json');
+      const seed = JSON.parse(readFileSync(seedPath, 'utf8')) as SeedFile;
+      if (seed.marketListingsSettings) {
+        await this.setMarketListingsSettingsAsync(seed.marketListingsSettings);
+      }
+    }
+
     const count = await this.prisma.adPlacement.count();
     if (count > 0) return;
 
@@ -218,6 +229,48 @@ export class PrismaStorage {
         message: lead.message ?? null,
         consentContact: lead.consentContact,
         createdAt: new Date(lead.createdAt),
+      },
+    });
+  }
+
+  async getMarketListingsSettingsAsync(): Promise<MarketListingsSettings | undefined> {
+    const row = await this.prisma.marketListingsConfig.findUnique({ where: { id: 'default' } });
+    if (!row) return undefined;
+    return {
+      enabled: row.enabled,
+      maxCount: row.maxCount,
+      tabs: row.tabs as TabsTarget,
+      city: row.city,
+      state: row.state,
+      zipCode: row.zipCode,
+      label: row.label,
+      updatedAt: row.updatedAt.toISOString(),
+    };
+  }
+
+  async setMarketListingsSettingsAsync(settings: MarketListingsSettings): Promise<void> {
+    await this.prisma.marketListingsConfig.upsert({
+      where: { id: 'default' },
+      create: {
+        id: 'default',
+        enabled: settings.enabled,
+        maxCount: settings.maxCount,
+        tabs: settings.tabs as Prisma.InputJsonValue,
+        city: settings.city,
+        state: settings.state,
+        zipCode: settings.zipCode,
+        label: settings.label,
+        updatedAt: new Date(settings.updatedAt),
+      },
+      update: {
+        enabled: settings.enabled,
+        maxCount: settings.maxCount,
+        tabs: settings.tabs as Prisma.InputJsonValue,
+        city: settings.city,
+        state: settings.state,
+        zipCode: settings.zipCode,
+        label: settings.label,
+        updatedAt: new Date(settings.updatedAt),
       },
     });
   }

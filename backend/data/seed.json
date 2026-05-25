@@ -65,5 +65,15 @@
       "zip": "78701",
       "active": true
     }
-  ]
+  ],
+  "marketListingsSettings": {
+    "enabled": true,
+    "maxCount": 4,
+    "tabs": ["simple-calculator", "advanced-calculator", "affordability", "homes-by-payment"],
+    "city": "Orlando",
+    "state": "FL",
+    "zipCode": "32801",
+    "label": "Homes for sale in the U.S.",
+    "updatedAt": "2026-05-24T00:00:00.000Z"
+  }
 }

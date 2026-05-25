@@ -56,6 +56,12 @@ node scripts/linear-reconcile-states.mjs
 | AVV-42–43 | Homes by Payment | API + reverse + filtros | smoke staging |
 | AVV-44 | Learning | 12 artículos JSON | CMS P1 |
 | AVV-45 | Partners | form + POST lead | privacy URL |
+| AVV-46 | Epic US market listings (Straply) | Parent P1-01 | — |
+| AVV-47 | P1-01a Diseño + Linear | Sub-issues + docs | — |
+| AVV-48 | P1-01b Backend Straply | API + caché | STRAPLY_API_KEY |
+| AVV-49 | P1-01c FE módulo | Debajo sponsored | — |
+| AVV-50 | P1-01d Admin | toggle + maxCount | — |
+| AVV-51 | P1-01e Deploy prod | Railway + smoke | STRAPLY_API_KEY |
 
 ## Commits de referencia (main)
 

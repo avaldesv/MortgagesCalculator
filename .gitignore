@@ -44,3 +44,5 @@ Thumbs.db
 
 # Local secrets
 .env.local
+backend/.env
+backend/.env.local

@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { environment } from '../../../environments/environment';
+import { MarketListingsSettings } from '../models/market-listings.model';
 import { ListingsAdPlacement, SponsoredListing } from '../models/listings-ad.model';
 import { AdminAuthService } from './admin-auth.service';
 
@@ -34,6 +35,21 @@ export class AdminApiService {
   patchListing(id: string, body: Partial<SponsoredListing>) {
     return this.http.patch<SponsoredListing>(
       `${environment.apiBaseUrl}/api/v1/admin/listings/${id}`,
+      body,
+      { headers: this.auth.getAuthHeaders() },
+    );
+  }
+
+  getMarketListingsSettings() {
+    return this.http.get<MarketListingsSettings>(
+      `${environment.apiBaseUrl}/api/v1/admin/market-listings/settings`,
+      { headers: this.auth.getAuthHeaders() },
+    );
+  }
+
+  patchMarketListingsSettings(body: Partial<MarketListingsSettings>) {
+    return this.http.patch<MarketListingsSettings>(
+      `${environment.apiBaseUrl}/api/v1/admin/market-listings/settings`,
       body,
       { headers: this.auth.getAuthHeaders() },
     );

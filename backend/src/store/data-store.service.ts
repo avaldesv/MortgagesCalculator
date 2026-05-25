@@ -52,6 +52,17 @@ export interface SponsoredListing {
   active: boolean;
 }
 
+export interface MarketListingsSettings {
+  enabled: boolean;
+  maxCount: number;
+  tabs: TabsTarget;
+  city: string;
+  state: string;
+  zipCode: string;
+  label: string;
+  updatedAt: string;
+}
+
 export interface PartnerLead {
   id: string;
   name: string;
@@ -135,5 +146,15 @@ export class DataStoreService implements OnModuleInit {
   async getPartnerLeads(): Promise<PartnerLead[]> {
     if (this.prismaStore) return this.prismaStore.getPartnerLeadsAsync();
     return this.json!.getPartnerLeads();
+  }
+
+  async getMarketListingsSettings(): Promise<MarketListingsSettings | undefined> {
+    if (this.prismaStore) return this.prismaStore.getMarketListingsSettingsAsync();
+    return this.json!.getMarketListingsSettings();
+  }
+
+  async setMarketListingsSettings(settings: MarketListingsSettings): Promise<void> {
+    if (this.prismaStore) return this.prismaStore.setMarketListingsSettingsAsync(settings);
+    this.json!.setMarketListingsSettings(settings);
   }
 }

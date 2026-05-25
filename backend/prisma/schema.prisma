@@ -33,6 +33,18 @@ model SponsoredListing {
   active                  Boolean @default(true)
 }
 
+model MarketListingsConfig {
+  id        String   @id @default("default")
+  enabled   Boolean
+  maxCount  Int
+  tabs      Json
+  city      String
+  state     String
+  zipCode   String
+  label     String
+  updatedAt DateTime
+}
+
 model PartnerLead {
   id             String   @id
   name           String
