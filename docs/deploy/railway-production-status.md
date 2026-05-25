@@ -15,13 +15,19 @@ GET https://backend-production-dbaf7.up.railway.app/api/health
 
 Smoke (`node scripts/smoke-staging-api.mjs`): health, listings (3), partner lead 201.
 
-## Pendiente para cerrar AVV-34
+## Conectar Web ↔ API (redeploy Web)
 
-El **Web** aún llama a `/api/*` en su propio dominio (devuelve HTML). Falta:
+Diagnóstico: el bundle tenía `apiBaseUrl` vacío y nginx no hacía proxy → `/api/*` devolvía HTML.
 
-1. **API** → variable `CORS_ORIGIN=https://mortgagescalculator-production.up.railway.app`
-2. **Web** → variable de build `API_BASE_URL=https://backend-production-dbaf7.up.railway.app` → **Redeploy**
-3. Probar en el navegador: Homes by Payment, Admin, Partners.
+**Solución en repo:** nginx hace proxy de `/api/` al backend; `API_BASE_URL` con valor por defecto en build.
+
+1. **Redeploy solo el servicio Web** (commit con fix nginx).
+2. Variables opcionales en el servicio Web (runtime):
+   - `API_UPSTREAM_URL` = `https://backend-production-dbaf7.up.railway.app`
+   - `API_UPSTREAM_HOST` = `backend-production-dbaf7.up.railway.app`
+3. Build (opcional): `API_BASE_URL` marcada como **Available at Build Time** en Railway.
+4. Verificar: `https://mortgagescalculator-production.up.railway.app/api/health` → JSON (no HTML).
+5. Homes by Payment / Admin / Partners en el navegador.
 
 ## Linear
 

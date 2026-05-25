@@ -6,7 +6,11 @@ import { writeFileSync } from 'fs';
 import { resolve } from 'path';
 
 const mode = process.argv[2] || 'production';
-const apiBaseUrl = (process.env.API_BASE_URL ?? '').replace(/\/$/, '');
+const DEFAULT_PRODUCTION_API = 'https://backend-production-dbaf7.up.railway.app';
+const raw =
+  process.env.API_BASE_URL ??
+  (mode === 'production' && !process.env.API_BASE_URL ? DEFAULT_PRODUCTION_API : '');
+const apiBaseUrl = String(raw).replace(/\/$/, '');
 const production = mode !== 'development';
 
 const fileMap = {

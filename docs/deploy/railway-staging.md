@@ -29,7 +29,9 @@ Sin `DATABASE_URL` la API usa JSON en `data/` (válido para prueba rápida, no r
 
 | Variable | Ejemplo | Notas |
 |----------|---------|--------|
-| `API_BASE_URL` | `https://<api-staging>.up.railway.app` | Inyectada en build (sin barra final) |
+| `API_BASE_URL` | `https://<api-staging>.up.railway.app` | Build: marcar **Available at Build Time** |
+| `API_UPSTREAM_URL` | misma URL API | Runtime en Web: proxy nginx `/api/` |
+| `API_UPSTREAM_HOST` | host del API sin `https://` | ej. `backend-production-dbaf7.up.railway.app` |
 
 El `Dockerfile` del web ejecuta `scripts/generate-environment.mjs` antes de `ng build`.
 
