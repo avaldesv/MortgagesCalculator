@@ -37,9 +37,11 @@ Esperado:
 
 https://mortgagescalculator-production.up.railway.app/admin
 
-- Módulo **US market listings** activo
-- ZIP `32801` (o el que quieras)
-- `maxCount` 1–12
+1. **Log out** → **Sign in** de nuevo (tras redeploy el JWT anterior deja de valer si cambió `JWT_SECRET`).
+2. Usa el mismo `ADMIN_EMAIL` / `ADMIN_PASSWORD` definidos en el servicio **backend** en Railway (no el de tu máquina local si es distinto).
+3. Módulo **US market listings** activo, ZIP `32801`, `maxCount` 1–12.
+
+Si ves “Could not load listings” con todo vacío: casi siempre es sesión caducada → cerrar sesión y entrar otra vez.
 
 ## Linear
 

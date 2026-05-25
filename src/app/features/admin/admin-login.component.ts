@@ -1,6 +1,6 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AdminAuthService } from '../../core/services/admin-auth.service';
 
 @Component({
@@ -64,14 +64,21 @@ import { AdminAuthService } from '../../core/services/admin-auth.service';
     }
   `,
 })
-export class AdminLoginComponent {
+export class AdminLoginComponent implements OnInit {
   private readonly auth = inject(AdminAuthService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   email = 'admin@mortgagecalc.app';
   password = 'changeme123';
   readonly loading = signal(false);
   readonly error = signal('');
+
+  ngOnInit(): void {
+    if (this.route.snapshot.queryParamMap.get('session') === 'expired') {
+      this.error.set('Session expired after a deploy. Sign in again with your Railway admin password.');
+    }
+  }
 
   onSubmit(e: Event): void {
     e.preventDefault();

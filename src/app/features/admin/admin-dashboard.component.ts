@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { DecimalPipe } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
@@ -111,7 +112,7 @@ import { MarketListingsService } from '../../core/services/market-listings.servi
             <input id="market-label" type="text" [value]="m.label" (change)="saveMarketLabel($event)" />
           </div>
         } @else if (!loading()) {
-          <p class="admin-empty">Market settings not loaded.</p>
+          <p class="admin-empty">{{ marketLoadError() ?? 'Market settings not loaded.' }}</p>
         }
       </div>
 
@@ -190,6 +191,7 @@ export class AdminDashboardComponent implements OnInit {
   readonly placements = signal<ListingsAdPlacement[]>([]);
   readonly listings = signal<SponsoredListing[]>([]);
   readonly marketSettings = signal<MarketListingsSettings | null>(null);
+  readonly marketLoadError = signal<string | null>(null);
   readonly loading = signal(true);
   readonly loadError = signal<string | null>(null);
 
@@ -217,7 +219,8 @@ export class AdminDashboardComponent implements OnInit {
         placementsDone = true;
         done();
       },
-      error: () => {
+      error: (err) => {
+        if (this.handleUnauthorized(err)) return;
         this.loadError.set('Could not load ad placements. Try logging out and in again.');
         placementsDone = true;
         done();
@@ -230,7 +233,8 @@ export class AdminDashboardComponent implements OnInit {
         listingsDone = true;
         done();
       },
-      error: () => {
+      error: (err) => {
+        if (this.handleUnauthorized(err)) return;
         this.loadError.set('Could not load listings. Try logging out and in again.');
         listingsDone = true;
         done();
@@ -240,14 +244,25 @@ export class AdminDashboardComponent implements OnInit {
     this.api.getMarketListingsSettings().subscribe({
       next: (s) => {
         this.marketSettings.set(s);
+        this.marketLoadError.set(null);
         marketDone = true;
         done();
       },
-      error: () => {
+      error: (err) => {
+        if (this.handleUnauthorized(err)) return;
+        this.marketLoadError.set('Could not load market settings.');
         marketDone = true;
         done();
       },
     });
+  }
+
+  /** JWT inválido tras redeploy — limpiar token y volver a login. */
+  private handleUnauthorized(err: unknown): boolean {
+    if (!(err instanceof HttpErrorResponse) || err.status !== 401) return false;
+    this.auth.logout();
+    void this.router.navigate(['/admin/login'], { queryParams: { session: 'expired' } });
+    return true;
   }
 
   private patchMarket(body: Partial<MarketListingsSettings>): void {
