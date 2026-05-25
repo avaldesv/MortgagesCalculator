@@ -51,9 +51,24 @@ export interface SponsoredListing {
   active: boolean;
 }
 
+export interface PartnerLead {
+  id: string;
+  name: string;
+  company: string;
+  email: string;
+  phone: string;
+  serviceType: string;
+  targetRegion: string;
+  monthlyBudget?: number;
+  message?: string;
+  consentContact: boolean;
+  createdAt: string;
+}
+
 interface StoreData {
   placements: AdPlacement[];
   listings: SponsoredListing[];
+  partnerLeads?: PartnerLead[];
 }
 
 @Injectable()
@@ -69,6 +84,10 @@ export class DataStoreService implements OnModuleInit {
       this.data = JSON.parse(readFileSync(this.storePath, 'utf8')) as StoreData;
     } else {
       this.data = JSON.parse(readFileSync(this.seedPath, 'utf8')) as StoreData;
+      this.persist();
+    }
+    if (!this.data.partnerLeads) {
+      this.data.partnerLeads = [];
       this.persist();
     }
   }
@@ -121,5 +140,14 @@ export class DataStoreService implements OnModuleInit {
     if (this.data.listings.length === before) return false;
     this.persist();
     return true;
+  }
+
+  addPartnerLead(lead: PartnerLead): void {
+    this.data.partnerLeads!.push(lead);
+    this.persist();
+  }
+
+  getPartnerLeads(): PartnerLead[] {
+    return [...(this.data.partnerLeads ?? [])];
   }
 }

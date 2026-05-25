@@ -1,0 +1,31 @@
+<app-modular-page tabId="learning-center">
+  <section class="hero card">
+    <h1>Learning Center</h1>
+    <p class="hero__sub">
+      Mortgage guides for U.S. homebuyers — educational content only, not lending advice.
+    </p>
+  </section>
+
+  @for (category of categories; track category) {
+    <section class="category-block">
+      <h2 class="category-block__title">{{ category }}</h2>
+      <div class="article-grid">
+        @for (article of byCategory(category); track article.id) {
+          <article class="card article-card" [class.article-card--open]="selectedId() === article.id">
+            <button type="button" class="article-card__head" (click)="select(article.id)">
+              <h3>{{ article.title }}</h3>
+              <span class="article-card__meta">{{ article.readMinutes }} min read</span>
+            </button>
+            <p class="article-card__summary">{{ article.summary }}</p>
+            @if (selectedId() === article.id) {
+              <p class="article-card__body">
+                Full article content coming soon. This summary is provided for planning and education.
+                Consult a licensed loan officer for decisions about your situation.
+              </p>
+            }
+          </article>
+        }
+      </div>
+    </section>
+  }
+</app-modular-page>

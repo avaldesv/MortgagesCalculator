@@ -1,0 +1,78 @@
+<app-modular-page tabId="partners">
+  <section class="hero card">
+    <h1>Advertise to Active Homebuyers</h1>
+    <p class="hero__sub">
+      Partner with MortgageCalc to reach users comparing payments, affordability, and homes by budget.
+    </p>
+  </section>
+
+  @if (successId()) {
+    <p class="banner banner--success card">
+      Thank you — we received your inquiry (ref {{ successId() }}).
+    </p>
+  }
+  @if (errorMessage()) {
+    <p class="banner banner--error card">{{ errorMessage() }}</p>
+  }
+
+  <form class="card partner-form" (submit)="$event.preventDefault(); submit()">
+    <h2 class="card__title">Partner inquiry</h2>
+
+    <label class="field">
+      <span>Name</span>
+      <input type="text" [(ngModel)]="name" name="name" required maxlength="120" />
+    </label>
+
+    <label class="field">
+      <span>Company</span>
+      <input type="text" [(ngModel)]="company" name="company" required maxlength="200" />
+    </label>
+
+    <label class="field">
+      <span>Email</span>
+      <input type="email" [(ngModel)]="email" name="email" required maxlength="254" />
+    </label>
+
+    <label class="field">
+      <span>Phone</span>
+      <input type="tel" [(ngModel)]="phone" name="phone" required maxlength="32" />
+    </label>
+
+    <label class="field">
+      <span>Service type</span>
+      <select [(ngModel)]="serviceType" name="serviceType">
+        @for (opt of serviceOptions; track opt.value) {
+          <option [value]="opt.value">{{ opt.label }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="field">
+      <span>Target region</span>
+      <input type="text" [(ngModel)]="targetRegion" name="region" required maxlength="200" placeholder="e.g. Orlando, FL" />
+    </label>
+
+    <label class="field">
+      <span>Monthly ad budget (optional)</span>
+      <input type="number" [(ngModel)]="monthlyBudget" name="budget" min="0" />
+    </label>
+
+    <label class="field">
+      <span>Message (optional)</span>
+      <textarea [(ngModel)]="message" name="message" rows="4" maxlength="4000"></textarea>
+    </label>
+
+    <label class="field field--checkbox">
+      <input type="checkbox" [(ngModel)]="consentContact" name="consent" />
+      <span>I agree to be contacted about partnership opportunities.</span>
+    </label>
+
+    <button type="submit" class="btn btn--primary" [disabled]="submitting()">
+      {{ submitting() ? 'Submitting…' : 'Submit inquiry' }}
+    </button>
+
+    <p class="form-note">
+      Estimates and listings on MortgageCalc are educational. See our compliance disclosures in the footer.
+    </p>
+  </form>
+</app-modular-page>

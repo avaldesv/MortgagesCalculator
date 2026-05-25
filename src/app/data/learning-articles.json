@@ -1,0 +1,86 @@
+[
+  {
+    "id": "down-payment-basics",
+    "title": "How much down payment do you need?",
+    "summary": "Understand 3%, 5%, 10%, and 20% down options and how PMI fits in.",
+    "readMinutes": 4,
+    "category": "Getting started"
+  },
+  {
+    "id": "credit-score-mortgage",
+    "title": "Credit scores and mortgage rates",
+    "summary": "Why lenders tier pricing by score and what to improve before you apply.",
+    "readMinutes": 5,
+    "category": "Getting started"
+  },
+  {
+    "id": "fixed-vs-arm",
+    "title": "Fixed-rate vs adjustable (ARM) loans",
+    "summary": "When a 30-year fixed makes sense and when an ARM might be worth considering.",
+    "readMinutes": 6,
+    "category": "Loan types"
+  },
+  {
+    "id": "closing-costs",
+    "title": "Closing costs explained",
+    "summary": "Typical fees at closing and how to budget beyond the down payment.",
+    "readMinutes": 5,
+    "category": "Costs"
+  },
+  {
+    "id": "pmi-removal",
+    "title": "PMI: what it is and how to remove it",
+    "summary": "Private mortgage insurance rules when you put less than 20% down.",
+    "readMinutes": 4,
+    "category": "Costs"
+  },
+  {
+    "id": "dti-ratio",
+    "title": "Debt-to-income (DTI) ratios",
+    "summary": "Front-end vs back-end DTI and how lenders use them in approval.",
+    "readMinutes": 5,
+    "category": "Affordability"
+  },
+  {
+    "id": "preapproval-vs-prequal",
+    "title": "Pre-approval vs pre-qualification",
+    "summary": "The difference between a soft estimate and a verified lender letter.",
+    "readMinutes": 4,
+    "category": "Process"
+  },
+  {
+    "id": "rate-lock",
+    "title": "When to lock your interest rate",
+    "summary": "Rate locks, float-down options, and timing around your closing date.",
+    "readMinutes": 5,
+    "category": "Process"
+  },
+  {
+    "id": "refinance-basics",
+    "title": "Refinancing basics",
+    "summary": "Rate-and-term vs cash-out refi and the break-even on closing costs.",
+    "readMinutes": 6,
+    "category": "Refinance"
+  },
+  {
+    "id": "escrow-account",
+    "title": "Escrow for taxes and insurance",
+    "summary": "How escrow accounts work and why your payment can change over time.",
+    "readMinutes": 4,
+    "category": "Costs"
+  },
+  {
+    "id": "first-time-programs",
+    "title": "First-time homebuyer programs",
+    "summary": "Overview of FHA, VA, USDA, and state/local assistance concepts.",
+    "readMinutes": 7,
+    "category": "Programs"
+  },
+  {
+    "id": "home-inspection",
+    "title": "Home inspection checklist",
+    "summary": "What inspectors look for and how findings affect negotiations.",
+    "readMinutes": 5,
+    "category": "Buying"
+  }
+]
